@@ -1,0 +1,38 @@
+{
+  "id": "pf2e-heuristic-fallback",
+  "title": "PF2e Animation Heuristic Fallback",
+  "description": "Provides intelligent fallback animations for PF2e spells using JB2A assets with deep spell understanding and heuristic routing.",
+  "version": "7.1.1",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "authors": [
+    {
+      "name": "bluebirdlady"
+    }
+  ],
+  "scripts": [
+    "working_version_lacking_some_content.js"
+  ],
+  "relationships": {
+    "requires": [
+      {
+        "id": "sequencer",
+        "type": "module",
+        "manifest": "https://github.com/fantasycalendar/FoundryVTT-Sequencer/releases/latest/download/module.json"
+      }
+    ],
+    "recommends": [
+      {
+        "id": "jb2a_patreon",
+        "type": "module"
+      }
+    ]
+  },
+  "socket": false,
+  "manifest": "https://raw.githubusercontent.com/bluebirdlady/pf2e-animation-heuristic-fallback/main/module.json",
+  "download": "https://github.com/bluebirdlady/pf2e-animation-heuristic-fallback/archive/refs/heads/main.zip",
+  "url": "https://github.com/bluebirdlady/pf2e-animation-heuristic-fallback"
+}
