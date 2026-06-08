@@ -1,6 +1,11 @@
 /**
  * PF2e Heuristic Fallback Animation Engine
- * Version: 7.1.1 (Restored Routing Stream)
+ * Version: 7.1.1+ Enhanced (With Layered Classification System)
+ * 
+ * Part 1.1: Added non-breaking enhanced classification layer
+ * - Original keyword routing remains fully functional
+ * - New classification is opt-in via "advancedClassification" setting
+ * - Layers richer spell understanding without replacing existing logic
  */
 
 // ============================================================
@@ -39,6 +44,14 @@ const registerSettings = () => {
         type: Boolean,
         default: true
     });
+    safeRegister("advancedClassification", {
+        name: "Enable Advanced Spell Classification (Experimental)",
+        hint: "Layer richer spell analysis (traditions, schools) on top of keyword matching. Non-breaking.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -53,7 +66,12 @@ const getSettingSafe = (key) => {
             return game.settings.get("pf2e-heuristic-fallback", key);
         }
     } catch(e) {}
-    const fallbacks = { enable: true, lingeringEffects: true, blendModes: true };
+    const fallbacks = { 
+        enable: true, 
+        lingeringEffects: true, 
+        blendModes: true,
+        advancedClassification: false
+    };
     return fallbacks[key];
 };
 
@@ -128,6 +146,35 @@ const EXPLICIT_DATABASE_MAP = {
 };
 
 // ============================================================
+// 2.1 ENHANCED CLASSIFICATION DICTIONARY (NEW - Part 1.1)
+// ============================================================
+// This layer adds richer spell understanding without breaking existing routing.
+// Only activated if advancedClassification setting is enabled.
+const ENHANCED_CLASSIFICATION = {
+    traditions: {
+        arcane: "jb2a.magic_signs.circle.02.enchantment.intro",
+        divine: "jb2a.magic_signs.circle.02.abjuration.intro",
+        occult: "jb2a.magic_signs.circle.02.necromancy.intro",
+        primal: "jb2a.magic_signs.circle.02.conjuration.intro"
+    },
+    schools: {
+        evocation:     { overlay: "jb2a.energy_strands", color: "red" },
+        necromancy:    { overlay: "jb2a.skull",          color: "dark_purple" },
+        enchantment:   { overlay: "jb2a.rings",          color: "pink" },
+        illusion:      { overlay: "jb2a.glimmer",        color: "purple" },
+        transmutation: { overlay: "jb2a.morph",          color: "orange" },
+        abjuration:    { overlay: "jb2a.shield",         color: "blue" },
+        conjuration:   { overlay: "jb2a.portal",         color: "bluegreen" },
+        divination:    { overlay: "jb2a.eye",            color: "gold" }
+    },
+    restraints: {
+        nature:  { ground: "jb2a.entangle.green",    overlay: "jb2a.vines.growth.green" },
+        force:   { ground: "jb2a.shattered_earth",  overlay: "jb2a.spectral_chains.standard" },
+        default: { ground: "jb2a.magic_signs.circle",overlay: "jb2a.chains.standard" }
+    }
+};
+
+// ============================================================
 // 3. SILENT SAFESTOP VALIDATION ENGINE
 // ============================================================
 function resolveVerifiedAssetPath(assetType, preferredColor) {
@@ -160,6 +207,54 @@ function resolveVerifiedAssetPath(assetType, preferredColor) {
 
     ASSET_CACHE.set(cacheKey, null);
     return null;
+}
+
+// ============================================================
+// 3.1 ENHANCED CLASSIFICATION APPLIER (NEW - Part 1.1)
+// ============================================================
+// Non-breaking function that layers classification on top of base config.
+// If advancedClassification is disabled, this is a no-op passthrough.
+function applyEnhancedClassification(baseConfig, spell) {
+    // Early return if feature not enabled
+    if (!getSettingSafe("advancedClassification")) {
+        return baseConfig;
+    }
+
+    // Guard against missing system data
+    if (!spell.system) {
+        return baseConfig;
+    }
+
+    try {
+        const traits = spell.system.traits?.value || [];
+        
+        // Attempt to detect tradition from traits
+        const traditionKey = traits.find(t => ENHANCED_CLASSIFICATION.traditions[t]);
+        if (traditionKey) {
+            baseConfig.traditionKey = traditionKey;
+            baseConfig.traditionCircle = ENHANCED_CLASSIFICATION.traditions[traditionKey];
+            console.debug(`PF2e Heuristic | Classification: Tradition detected (${traditionKey})`);
+        }
+        
+        // Attempt to detect school from traits
+        const schoolKey = traits.find(t => ENHANCED_CLASSIFICATION.schools[t]);
+        if (schoolKey) {
+            baseConfig.schoolKey = schoolKey;
+            baseConfig.schoolOverlay = ENHANCED_CLASSIFICATION.schools[schoolKey];
+            console.debug(`PF2e Heuristic | Classification: School detected (${schoolKey})`);
+        }
+        
+        // Log classification attempt for debugging
+        if (traditionKey || schoolKey) {
+            console.debug(`PF2e Heuristic | Enhanced classification applied to: ${spell.name}`);
+        }
+
+    } catch (e) {
+        // Fail silently - classification is optional
+        console.debug(`PF2e Heuristic | Classification error (non-fatal):`, e.message);
+    }
+
+    return baseConfig;
 }
 
 // ============================================================
@@ -197,6 +292,9 @@ function parseSpellToAnimation(spell) {
     config.projectile = resolveVerifiedAssetPath("projectile", config.color);
     config.tokenBuff  = resolveVerifiedAssetPath("tokenBuff", config.color);
 
+    // NEW (Part 1.1): Apply enhanced classification layer
+    config = applyEnhancedClassification(config, spell);
+
     return config;
 }
 
@@ -228,6 +326,18 @@ async function executeHeuristicAnimation(spell, token) {
         animationConfig.groundRing ? "color: #00ff66;" : "color: #ff3333;",
         animationConfig.tokenBuff ? "color: #00ff66;" : "color: #ff3333;"
     );
+
+    // NEW (Part 1.1): Log classification info if present
+    if (animationConfig.traditionCircle || animationConfig.schoolOverlay) {
+        console.log(
+            `%cPF2E HEURISTIC | ENHANCED CLASSIFICATION:\n` +
+            `%c  • Tradition: ${animationConfig.traditionKey || "none"}\n` +
+            `%c  • School: ${animationConfig.schoolKey || "none"}`,
+            "color: #99ff99; font-weight: bold;",
+            animationConfig.traditionCircle ? "color: #00ff99;" : "color: #666666;",
+            animationConfig.schoolOverlay ? "color: #00ff99;" : "color: #666666;"
+        );
+    }
 
     // PHASE 1: Casting Origin Elements
     if (animationConfig.castRing) {
@@ -400,4 +510,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1 Diagnostic Ready.");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer Added)");
