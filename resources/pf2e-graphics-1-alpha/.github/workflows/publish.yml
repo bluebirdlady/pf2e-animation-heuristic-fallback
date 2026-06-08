@@ -1,0 +1,120 @@
+name: Release creation
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        run: bun install
+
+        # Get part of the tag after the `v`
+      - name: Extract tag version number
+        id: get-version
+        run: echo "version-without-v=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Get module JSON
+        id: set_var
+        run: |
+          echo "PACKAGE_JSON=$(jq -c . < module.json)" >> $GITHUB_OUTPUT
+
+      - name: Get module title
+        id: title
+        run: echo "title=${{ fromJson(steps.set_var.outputs.PACKAGE_JSON).title }}" >> "$GITHUB_OUTPUT"
+
+        # Substitute the manifest and download URLs in the `module.json`.
+      - name: Substitute manifest and download links for versioned ones
+        id: sub_manifest_link_version
+        uses: devops-actions/variable-substitution@v1.2
+        with:
+          files: module.json
+        env:
+          version: ${{ steps.get-version.outputs.version-without-v }}
+          manifest: https://github.com/${{ github.repository }}/releases/latest/download/module.json
+          download: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.zip
+
+      - name: Substitute manifest for prerelease
+        if: github.event.release.prerelease
+        id: sub_prerelease_manifest_version
+        uses: devops-actions/variable-substitution@v1.2
+        with:
+          files: module.json
+        env:
+          manifest: https://raw.githubusercontent.com/${{ github.repository }}/next/module.json
+
+      - name: Build
+        run: bun run build
+
+        # Create a folder containing all the module stuff and zip it for the release
+      - name: Create zip
+        run: zip -r9 ./module.zip module.json assets/ lang/ packs/ dist/ README.md LICENSE CHANGELOG.md
+
+      - name: Get changelog body
+        id: changelog
+        uses: release-flow/keep-a-changelog-action@v3
+        with:
+          command: query
+          version: ${{ steps.get-version.outputs.version-without-v }}
+
+      - name: Update release with files
+        id: create_version_release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          omitDraftDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          name: ${{ steps.get-version.outputs.version-without-v }}
+          body: ${{ steps.changelog.outputs.release-notes }}
+          artifacts: './module.json, ./module.zip'
+
+      - name: Publish to FoundryVTT
+        uses: cs96and/FoundryVTT-release-package@v1.0.2
+        if: ${{ !github.event.release.prerelease && env.PACKAGE_TOKEN }}
+        env:
+          PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
+        with:
+          package-token: ${{ env.PACKAGE_TOKEN }}
+          manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+
+      - name: Announce on Discord
+        uses: Ilshidur/action-discord@master
+        if: ${{ !github.event.release.prerelease }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: ${{ steps.title.outputs.title }}
+        with:
+          args: |
+            # Version ${{ steps.get-version.outputs.version-without-v }}
+            https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+            ${{ steps.changelog.outputs.release-notes }}
+
+            # Run the following when setting up a repo
+            # git switch --orphan next && git commit --allow-empty -m "init" && git push -u origin next
+
+      - name: Update prerelease repository
+        if: github.event.release.prerelease
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git add module.json
+          git stash
+          git clean -f
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
+          git fetch origin "next"
+          git switch -c "next" "origin/next"
+          git checkout stash module.json
+          git commit -m "${{ github.event.release.tag_name }} manifest"
+          git push -f

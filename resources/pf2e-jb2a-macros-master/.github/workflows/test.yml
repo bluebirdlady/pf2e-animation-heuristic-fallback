@@ -1,0 +1,36 @@
+name: Test Autorec
+
+on:
+  pull_request:
+    paths:
+      - "animations"
+      - "module/autorec.json"
+      - "scripts/combine-animations.mjs"
+      - "scripts/test-animations.mjs"
+      - ".github/workflows/test.yml"
+  push:
+    paths:
+      - "animations"
+      - "module/autorec.json"
+      - "scripts/combine-animations.mjs"
+      - "scripts/test-animations.mjs"
+      - ".github/workflows/test.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Combine Animation Files
+        run: npm run combine
+
+      - name: Test
+        run: npm run test

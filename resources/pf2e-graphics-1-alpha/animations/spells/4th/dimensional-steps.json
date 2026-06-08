@@ -1,0 +1,127 @@
+{
+	"spell:dimensional-steps": [
+		{
+			"triggers": [
+				"action"
+			],
+			"contents": [
+				{
+					"label": "Spell: Dimensional Steps (Crosshair)",
+					"execute": {
+						"type": "crosshair",
+						"prompt": {
+							"text": "Pick a location for the @UUID[Compendium.pf2e.spells-srd.Item.zjG6NncHyAKqSF7m] teleport!"
+						},
+						"name": "spell-dimensional-steps",
+						"template": {
+							"type": "token",
+							"relativeTo": "SOURCES"
+						},
+						"icon": {
+							"texture": "systems/pf2e/icons/spells/dimensional-step.webp",
+							"borderVisible": true
+						}
+					}
+				},
+				{
+					"label": "Spell: Dimensional Steps (Blue Swirl)",
+					"execute": {
+						"type": "graphic",
+						"graphic": [
+							"jb2a.portals.horizontal.ring.blue"
+						],
+						"elevation": {
+							"sortLayer": "belowTokens"
+						},
+						"rotation": {
+							"type": "absolute",
+							"angle": "random"
+						},
+						"size": {
+							"type": "relative",
+							"relativeTo": "SOURCES",
+							"scaling": 2.2,
+							"scaleIn": {
+								"duration": 1000,
+								"initialScale": 0,
+								"ease": "easeInOutElastic"
+							},
+							"scaleOut": {
+								"duration": 1000,
+								"finalScale": 0,
+								"ease": "easeInOutElastic"
+							}
+						},
+						"fadeIn": {
+							"duration": 2000,
+							"ease": "easeOutElastic"
+						},
+						"fadeOut": {
+							"duration": 2000,
+							"ease": "easeInElastic"
+						},
+						"duration": 5000,
+						"visibility": {
+							"opacity": 0.75
+						}
+					},
+					"contents": [
+						{
+							"execute": {
+								"position": {
+									"type": "static",
+									"location": "SOURCES"
+								}
+							}
+						},
+						{
+							"execute": {
+								"position": {
+									"type": "static",
+									"location": "spell-dimensional-steps"
+								}
+							}
+						}
+					]
+				},
+				{
+					"execute": {
+						"type": "animation",
+						"subjects": [
+							"SOURCES"
+						],
+						"delay": 1500,
+						"fadeOut": {
+							"duration": 500
+						}
+					}
+				},
+				{
+					"execute": {
+						"type": "animation",
+						"subjects": [
+							"SOURCES"
+						],
+						"delay": 2500,
+						"position": {
+							"type": "teleport",
+							"location": "spell-dimensional-steps"
+						}
+					}
+				},
+				{
+					"execute": {
+						"type": "animation",
+						"subjects": [
+							"SOURCES"
+						],
+						"delay": 2500,
+						"fadeIn": {
+							"duration": 500
+						}
+					}
+				}
+			]
+		}
+	]
+}

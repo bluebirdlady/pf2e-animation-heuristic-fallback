@@ -1,0 +1,49 @@
+{
+	"extends": "@tsconfig/svelte/tsconfig.json",
+	"compilerOptions": {
+		"target": "ESNext",
+		"useDefineForClassFields": true,
+		"baseUrl": ".",
+		"rootDir": ".",
+		"module": "ESNext",
+		"resolveJsonModule": true,
+		"types": [
+			"vite/client",
+			"foundry-pf2e",
+			"foundry-pf2e/pf2e-toolbelt",
+			"foundry-pf2e/socketlib",
+			"@typhonjs-fvtt/runtime/types/fvtt-shim/pf2e",
+			"jquery",
+			"sequencer"
+		],
+		"allowImportingTsExtensions": true,
+		/**
+		 * Typecheck JS in `.svelte` and `.js` files by default.
+		 * Disable checkJs if you'd like to use dynamic types in JS.
+		 * Note that setting allowJs false does not prevent the use
+		 * of JS in `.svelte` files.
+		 */
+		"allowJs": true,
+		"checkJs": true,
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		// Best practices
+		"noEmit": true,
+		"sourceMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"erasableSyntaxOnly": true,
+		"skipLibCheck": true
+	},
+	"include": [
+		"src/**/*",
+		"scripts/**/*",
+		"schema/**/*"
+	]
+}

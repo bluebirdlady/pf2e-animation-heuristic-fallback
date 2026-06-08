@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.pf2e-g {
+	/* Teehee */
+	& .tjs-app-icon:hover {
+		@apply animate-spin bg-cyan-500/50 transition-colors duration-500 cursor-none;
+	}
+
+	/* https://github.com/FortAwesome/Font-Awesome/issues/12607#issuecomment-506886318 */
+	& .ko-fi::after {
+		content: '\f004';
+		font-weight: 900;
+		font-size: 0.4rem;
+		color: #ff5e5e;
+		position: absolute;
+		margin: 0.42rem 0 0 -0.74rem;
+	}
+
+	& .bg-button {
+		background: rgba(0, 0, 0, 0.1);
+		border: 2px groove var(--color-border-light-highlight);
+		border-radius: 3px;
+	}
+
+	.disabled {
+		filter: opacity(0.66);
+	}
+
+	& button {
+		&.disabled,
+		&:disabled {
+			cursor: not-allowed;
+		}
+	}
+
+	& ::placeholder {
+		opacity: 50%;
+	}
+
+	&.json-export {
+		& .dialog-buttons {
+			@apply flex-grow-0 pt-1;
+		}
+	}
+
+	& .border-y-foundry {
+		border-bottom: 1px solid var(--secondary-background);
+		border-top: 1px solid var(--secondary-background);
+	}
+
+	& .tab-button {
+		all: unset;
+
+		@apply w-full;
+
+		&:hover {
+			text-shadow: 0 0 10px var(--color-shadow-primary);
+		}
+	}
+
+	& .active-tab {
+		text-shadow: 0 0 10px var(--color-shadow-primary);
+		@apply underline font-bold;
+	}
+
+	button.jse-last {
+		display: none !important;
+	}
+
+	.jse-button.jse-group-button:not(.jse-last) {
+		border-right: 1px solid var(--jse-menu-color, var(--jse-text-color-inverse, #fff)) !important;
+	}
+}
+
+.multiselect {
+	--sms-width: 100%;
+	--sms-options-max-height: 20rem;
+
+	& button {
+		width: min-content;
+	}
+}
+
+#tooltip:has(> .pf2e-g) {
+	@apply text-sm max-w-52 bg-black bg-opacity-80;
+}
+
+.pf2e-g.no-window-padding.window-app .window-content {
+	padding: 0;
+}

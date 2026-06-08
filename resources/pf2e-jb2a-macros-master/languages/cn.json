@@ -1,0 +1,133 @@
+{
+	"pf2e-jb2a-macros": {
+		"updateMenu": {
+			"added": "下列效果将会被加入到你的自动识别设定文件中。",
+			"updated": "下列效果将从旧的'PF2e Animations'版本（或Automated Animations的默认版本）更新。",
+			"nothing": "没有更新。",
+			"warning": "确保你备份了你的自动识别文件！这个操作是无法被撤销的。",
+			"deleted": "下列效果将会从'PF2e Animations'中被移除。",
+			"custom": "下列效果不会被加入，因为他们已被从另外的源导入。",
+			"customHint": "如果你想要使用'PF2e Animations'版本的配置，请先将他们从你的自动识别菜单里删除。",
+			"debugCustom": "下列效果不存在于PF2e Animations中，他们将继续留在您的自动识别文件里。",
+			"blacklisted": "下列特效已经被加入黑名单且会被从你的自动识别文件内移除。"
+		},
+		"notifications": {
+			"noJB2A": "你需要<a href=\"https://jb2a.com/home/content-information/#free_library\">JB2A 模组</a>才能使用PF2e Animations模组（也就是本模组）！",
+			"noToken": "未找到源指示物。",
+			"creatingDummy": " 正在创建假人NPCs… ",
+			"noDummy": "缺少召唤宏所需的假人演员卡。",
+			"noPack": "无法找到'pf2e-jb2a-macros.Actions'包，解决一下？",
+			"update": "PF2e Animations v{version} 已加载。请确认你是否有新的自动识别文件可用！",
+			"metaData": "这个动画将在升级时被替换。如果你不想这么做，最好将它的<b>动画</b>或<b>变体</b>临时更改为其他，或在配置中启用Debug模式并再次点击MetaData按钮。",
+			"noDependencies": "你缺少<b>{modules}</b>模组，请启动他们来让本模组正常运行！",
+			"wrongVersion": "你缺少<b>{modules}</b>模组，请安装或升级他们来让本模组正常运行！",
+			"outOfRange": "目标超出射程。",
+			"tooManyArgs": "此宏的条件过多！以下条件不可用：{issues}",
+			"noPrem": "你没有安装<a href='https://www.patreon.com/JB2A/membership'>JB2A Patreon版本</a> ，无法使用此动画！",
+			"gridless": "仅推荐在网格地图中使用十字准星，无网格地图可能会引起错误",
+			"unevenGrid": "你的场景网格宽度不一致，这可能会因此目标定位错误！",
+			"killAnimationsOnKill": "被击败的参战者\"{name}\"上的动画特效已被移除。"
+		},
+		"settings": {
+			"disableHitAnims": {
+				"name": "关闭\"On Hit or Miss\"动画",
+				"hint": "当你更新Automated Animation时，它的自动识别文件会自动再生成，开启本项来禁用这些动画。"
+			},
+			"randomHitAnims": {
+				"hint": "使失败和大失败的攻击失手动画随机出现在攻击目标的指示物附近。",
+				"name": "使\"On Hit or Miss\"的失手动画出现在目标指示物外"
+			},
+			"autoAccept": {
+				"name": "自动使用效果",
+				"hint": "自动使用来自宏的效果，比如当你使用Rage动作时自动使用Rage的效果。"
+			},
+			"autoUpdate": {
+				"name": "模组更新时打开更新设定文件菜单",
+				"hint": "当模组更新时，自动打开自动识别文件的更新菜单。"
+			},
+			"smallTokenScale": {
+				"name": "默认小型指示物尺寸",
+				"hint": "定义小型角色的动画。若你使用PF2E的\"Scale tokens according to size\"设定，本项应关闭却自动定义为0.8。"
+			},
+			"debug": {
+				"name": "Debug模式",
+				"hint": "打开Console记录本模组的行为。"
+			},
+			"autorecUpdate": {
+				"name": "动画更新",
+				"label": "更新文件"
+			},
+			"allowUncommonSummons": {
+				"name": "允许召唤非常见生物",
+				"hint": "允许玩家召唤罕见、稀有或独特生物。你可以在A-A设置中（或角色卡中法术右上的A-A设置中）通过增加“罕见”条件允许个别法术召唤罕见生物。"
+			},
+			"onlyImageSummons": {
+				"hint": "仅允许召唤有图像生物",
+				"name": "仅允许召唤有图像生物"
+			},
+			"tmfx": {
+				"name": "使用Token Magic的效果",
+				"hint": "部分动画效果来自Token Magic FX而非Sequencer。此选项仅在安装Token Magic FX后出现。"
+			},
+			"killAnimationsOnKill": {
+				"name": "移除被击败的指示物上的动画特效",
+				"hint": "自动移除被击败的指示物上的动画特效。"
+			},
+			"killAnimationsOnKillNotify": {
+				"name": "提醒移除被击败的指示物上的动画",
+				"hint": "提醒移除那些在遭遇中被标记为被击败的指示物上的动画。"
+			}
+		},
+		"macro": {
+			"suddenCharge": {
+				"notif": "突袭冲锋！选择你想去的位置。右键取消。",
+				"suddenCharge": "突袭冲锋"
+			},
+			"disguise": {
+				"illusoryDisguise": "🎭幻象伪装🎭",
+				"tokenImageHint": "确保它在场景上工作，CORS是一个善变的神。",
+				"tokenScale": "指示物尺寸",
+				"invisible": "将你原来的指示物隐形？",
+				"humanoidForm": "🎭类人形态🎭",
+				"cast": "施放！",
+				"name": "姓名",
+				"tokenImage": "指示物图像",
+				"tokenScaleHint": "如果你要进入的令牌是一个拓展画令牌。或者比你更小！",
+				"invisibleHint": "默认打开，这会将指示物隐藏在幻象之下。在伪装成一个比你小或者头顶视角的指示物的时候很有用。"
+			},
+			"summoning": {
+				"player": {
+					"dancingLights": "选择你的舞光术…",
+					"label": "根据什么排序？",
+					"amount": "总数",
+					"title": "召唤任何东西",
+					"creature": "生物",
+					"level": "等级{level}",
+					"sorted": "根据等级和字母排序。",
+					"sourceArg": "根据来源筛选：<b>{sources}</b>.",
+					"uncommonArg": "允许选取<b>罕见及更高稀有度</b>.",
+					"summonArg": "根据等级筛选<b>从{spellLevel}环级法术中(max. level {multiplier})</b>.",
+					"traitsArg": "根据特征筛选： <b>{traits}</b>.",
+					"hasImageArg": "根据生物是否有<b>图像</b>筛选.",
+					"levelArg": "根据等级筛选<b>{level1}到{level2}</b>.",
+					"nothingFound": "找不到结果。检查你的筛选条件！",
+					"unique": "此筛选器根据{unique}单独设置",
+					"nameArg": "根据名称筛选： <b>{name}</b>。"
+				},
+				"gm": {
+					"unknownUser": "一个未知用户",
+					"declined": "拒绝！",
+					"title": "玩家请求召唤",
+					"content": "<p>{user}请求召唤<b>{amount} {actorName}</b>。</p><p>一个位置标识已经被创建在召唤的位置。如果你接受，召唤物将出现在那个位置。你可以在接受之前移动位置标识的位置。</p><p>拒绝请求或关闭本窗口会删除位置标识并结束召唤流程。</p>"
+				}
+			},
+			"outOfRange": "超出射程！"
+		},
+		"welcomeMessage": {
+			"header": "欢迎使用PF2e动画特效！",
+			"settingsButton": "打开设置",
+			"description": "本模组为PF2e系统提供了预制的动画特效。如果你的电脑配置较低或者画面中同时存在大量特效（常见于高级别的游戏中），这些动画特效可能会造成你的游戏卡顿。<p/>如果你不想看见这些动画特效，请查看<b>Sequencer</b>模组的设置并关闭<b>\"Enable Effects\"</b>选项。",
+			"footer": "你可以安全地删除本消息，本消息不会被再次发送。"
+		}
+	}
+}

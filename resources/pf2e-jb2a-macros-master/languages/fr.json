@@ -1,0 +1,133 @@
+{
+	"pf2e-jb2a-macros": {
+		"updateMenu": {
+			"deleted": "Les effets suivants seront EFFACÉS d'une précédente version de 'PF2e Animations'.",
+			"custom": "Les effets suivants ne seront pas ajoutés car ils existent déjà et proviennent d'une source inconnue.",
+			"customHint": "Si vous souhaitez la version 'PF2e Animations', effacez les de votre Menu Auto reconnaissance.",
+			"nothing": "Aucune mise à jour n'a été trouvée.",
+			"warning": "Soyez certain de faire une sauvegarde de votre Menu auto reconnaissance ! CE PROCESSUS EST IRRÉVERSIBLE.",
+			"added": "Les effets suivants vont être rajoutés à vos réglages d'Auto reconnaissance.",
+			"updated": "Les effets suivants seront mis à jour d'une version précédente de 'PF2e Animations' (ou issus du menu par défaut de Automated Animations).",
+			"debugCustom": "Les effets suivants n'existent pas dans PF2e Animations, ils sont complètement nouveaux et resteront dans votre Menu d'auto-reconnaissance.",
+			"blacklisted": "Les effets suivants sont placés sur liste noire et seront retirés de votre Menu d'auto-reconnaissance."
+		},
+		"notifications": {
+			"noJB2A": "Vous avez besoin d'un <a href=\"https://jb2a.com/home/content-information/#free_library\">module JB2A</a> actif pour l'utiliser avec le module PF2e Animations !",
+			"update": "PF2e Animations v{version} est chargé. Veuillez vérifier si vous n'avez pas besoin d'ajouter de nouvelles animation à votre menu d'auto-reconnaissance !",
+			"creatingDummy": " Création d'un PNJ fictif... ",
+			"noPack": "Impossible de trouver le pack 'pf2e-jb2a-macros.Actions' ?",
+			"noDummy": "Acteurs fictifs manquants pour les macros d'invocation.",
+			"noToken": "Pas de jeton source trouvé.",
+			"metaData": "Cette animation SERA remplacée lors de la mise à jour. Si vous ne voulez pas qu'elle le soit, le meilleur moyen est de changer temporairement son <b>animation</b> ou sa <b>variante</b> en autre chose, ou en activant le mode débogage dans les réglages et en pressant de nouveau le bouton Metadonnées de nouveau.",
+			"tooManyArgs": "Trop d'arguments pour cette macro ! Les arguments suivants sont incompatibles : {issues}",
+			"outOfRange": "La cible est hors de portée.",
+			"noPrem": "Il vous manque les assets de la <a href='https://www.patreon.com/JB2A/membership'>version premium de JB2A</a> pour utiliser cette animation !",
+			"noDependencies": "Il vous manque <b>{modules}</b> pour que les Animations PF2e fonctionnent pleinement ! Veuillez activer les modules indiqués !",
+			"wrongVersion": "Il vous manque <b>{modules}</b> pour que les Animations PF2e fonctionnent pleinement ! Veuillez mettre à jour les modules indiqués !",
+			"gridless": "Il est recommandé d'utiliser la mire seulement sur une scène avec grille. Les scènes sans grille pourraient provoquer des soucis.",
+			"unevenGrid": "La grille de votre scène est inégale ({grid}px). Cela entraînera probablement un décalage de l'emplacement de votre cible !",
+			"killAnimationsOnKill": "A retiré les animations du combattant vaincu \"{name}\"."
+		},
+		"settings": {
+			"disableHitAnims": {
+				"name": "Désactiver Animations \"Si touché ou échec\"",
+				"hint": "Bien que vous puissiez supprimer ces animations du menu d'Auto reconnaissance de AA, elles reviendront probablement lorsque vous le mettrez à jour. Activez cette option pour désactiver ces animations."
+			},
+			"randomHitAnims": {
+				"name": "Faire en sorte que les animations ratées \"Touché ou raté\" apparaissent hors cible",
+				"hint": "Les animations daté et raté critique apparaissent à un endroit aléatoire près du jeton ciblé raté."
+			},
+			"autoAccept": {
+				"name": "Accepter automatiquement les effets",
+				"hint": "Accepter automatiquement les effets des macros, par exemple en ajoutant l'effet Rage lorsque vous utilisez l'action Rage."
+			},
+			"smallTokenScale": {
+				"name": "Échelle par défaut pour les petits jetons",
+				"hint": "Détermine l'échelle que les animations prennent en compte pour les petits personnages. Si vous utilisez le paramètre système Pathfinder 2e \"Ajuster les jetons en fonction de la taille\", ce paramètre est désactivé et sera de 0.8."
+			},
+			"debug": {
+				"name": "Mode débogage",
+				"hint": "Active les journaux de console de ce que le module PF2e Animations est en train de faire."
+			},
+			"autorecUpdate": {
+				"name": "Mise à jour des animations",
+				"label": "Menu de mise à jour"
+			},
+			"autoUpdate": {
+				"name": "Ouvrir le menu de mise à jour lors de la mise à jour du module",
+				"hint": "Ouvre automatiquement le menu de mise à jour de l'auto-reconnaissance lorsque le module est mis à jour."
+			},
+			"allowUncommonSummons": {
+				"name": "Autoriser des invocations qui ne sont pas courantes",
+				"hint": "Permet aux joueurs d'invoquer des créatures peu courantes, rares ou uniques. Vous pouvez également autoriser cela pour des sorts individuels en ajoutant le terme en anglais \"uncommon\" aux arguments des sorts soit dans le menu de reconnaissance automatique soit dans le sort lui-même sur une feuille de personnage."
+			},
+			"onlyImageSummons": {
+				"name": "N'autoriser que les Invocations qui ont une image",
+				"hint": "Permet d'invoquer uniquement des créatures qui ont une image."
+			},
+			"tmfx": {
+				"hint": "Quelques animations tirent avantage d'être animées par Token Magic FX au lieu de Sequencer. Notez que ce réglage n'est montré que lorsque le module Token magic FX est installé.",
+				"name": "Utiliser les effets de Token magic"
+			},
+			"killAnimationsOnKill": {
+				"hint": "Retirer automatiquement les animations sur les jetons marqués comme vaincus dans l'initiative.",
+				"name": "Retirer les animations sur les jetons vaincus"
+			},
+			"killAnimationsOnKillNotify": {
+				"name": "Notifier le retrait des animations sur les jetons vaincus",
+				"hint": "Notifier le retrait des animations sur les jetons marqués comme vaincus dans l'initiative."
+			}
+		},
+		"macro": {
+			"suddenCharge": {
+				"notif": "Charge soudaine ! Choisissez où vous voulez vous déplacer. Clic droit pour annuler.",
+				"suddenCharge": "Charge soudaine"
+			},
+			"disguise": {
+				"humanoidForm": "🎭Forme humanoïde🎭",
+				"illusoryDisguise": "🎭Déguisement illusoire🎭",
+				"cast": "Lancé !",
+				"name": "Nom",
+				"tokenImage": "Image du jeton",
+				"tokenScale": "Échelle du jeton",
+				"tokenImageHint": "Vérifie que cela fonctionne sur la scène. CORS est un dieu capricieux.",
+				"invisible": "Rendre votre jeton original invisible ?",
+				"tokenScaleHint": "Au cas où le jeton dans lequel vous allez entrer serait un jeton pop-out. Ou s'il est plus petit que vous !",
+				"invisibleHint": "Activé par défaut, cela permet de cacher le jeton sous le déguisement. Utile pour se déguiser en un jeton plus petit ou en un jeton de type \"top-down\"."
+			},
+			"summoning": {
+				"player": {
+					"label": "Classés par… ?",
+					"creature": "Créature",
+					"amount": "Montant",
+					"title": "Invoquer n'importe quoi",
+					"dancingLights": "Sélectionnez vos lumières dansantes…",
+					"level": "Niveau {level}",
+					"sorted": "Classés par niveau et alphabétiquement.",
+					"summonArg": "Filtré par niveau <b>(niveau max. {multiplier} de niveau de sort {spellLevel})</b>.",
+					"levelArg": "Filtré par niveau <b>{level1} et supérieur, jusqu'au {level2}</b>.",
+					"traitsArg": "Filtré par traits : <b>{traits}</b>.",
+					"hasImageArg": "Filtré selon que la créature possède une <b>image </b> .",
+					"uncommonArg": "Les choix <b>peu courants ou plus rares</b> sont autorisés.",
+					"sourceArg": "Filtré par source : <b>{sources}</b>.",
+					"nothingFound": "Rien trouvé. Affinez vos arguments pour filtrer !",
+					"unique": "Les filtres sont définis de manière unique selon {unique}.",
+					"nameArg": "Filtré par nom : <b>{name}</b>."
+				},
+				"gm": {
+					"title": "Demande d'invocation du joueur",
+					"unknownUser": "Un utilisateur inconnu",
+					"declined": "Refusé !",
+					"content": "<p>{user} a demandé à invoquer <b>{amount} {actorName}</b>.</p><p>Un modèle a été créé pour montrer le gabarit de l'invocation. Si vous acceptez, l'invocation sera placée sur le gabarit. Vous pouvez déplacer le gabarit avant d'accepter.</p><p>Si vous refusez la demande ou si vous fermez cette fenêtre, le gabarit sera supprimé et rien ne sera placé.</p>"
+				}
+			},
+			"outOfRange": "Hors de portée !"
+		},
+		"welcomeMessage": {
+			"header": "Bienvenue sur PF2e Animations !",
+			"settingsButton": "Ouvrir les réglages",
+			"footer": "Vous pouvez effacer ce message en toute sécurité, il ne vous sera pas envoyé d'autre message.",
+			"description": "Ce module fournit des préréglages d'animation pour le système PF2e. Ces animations peuvent ralentir votre machine, que ce soit parce que vous avez un ordinateur en bout de course ou parce qu'il y a beaucoup d'effets à l'écran, ce qui est courant dans les hauts niveaux du jeu.<p/>Si vous ne voulez pas voir ces animations, veuillez consulter les paramètres du module <b>Sequencer</b> et désactiver le paramètre <b>\"Activer les effets\"</b>."
+		}
+	}
+}

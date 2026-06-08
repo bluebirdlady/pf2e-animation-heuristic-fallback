@@ -1,0 +1,326 @@
+{
+	"pf2e-graphics": {
+		"support": {
+			"1": "Donate!",
+			"2": "Support me!",
+			"3": "Help the author",
+			"4": "Tip jar",
+			"5": "Enjoying the module?"
+		},
+		"presetTypes": {
+			"ranged": "Ranged",
+			"melee": "Melee",
+			"onToken": "On-token",
+			"template": "Template",
+			"custom": "Custom"
+		},
+		"scopes": {
+			"scope": "Scope",
+			"full": {
+				"core": "Core scope",
+				"module": "Module scope",
+				"world": "World scope",
+				"user": "User scope",
+				"item": "Item scope"
+			},
+			"short": {
+				"core": "Core",
+				"module": "Module",
+				"world": "World",
+				"user": "User",
+				"item": "Item"
+			}
+		},
+		"load": {
+			"notify": {
+				"componentUpdated": "<code>{component}</code> updated!",
+				"animationSetsUpdated": "Animation sets updated!"
+			},
+			"error": {
+				"badModuleFlags": "Failed to read package flags for module {title} (<code>{id}</code>).",
+				"badModuleAnimations": "Failed to load animation sets for {title} (<code>{id}</code>). See console (<kbd>F12</kbd>) for more information.",
+				"badMessageFlags": "Failed to read module <code>ChatMessage</code> flags (received <code>{flags}</code>).",
+				"cantAccessFile": "Can't access file `{path}`.",
+				"schemaValidationFailed": "{number} animation sets failed validation! See console (<kbd>F12</kbd>) for more information."
+			}
+		},
+		"sidebar": {
+			"animationSets": {
+				"title": "Animation Sets",
+				"tooltip": "Animation Sets",
+				"create": {
+					"animationSet": {
+						"button": "Create Animation Set",
+						"popup": {
+							"title": "Create Animation Set",
+							"fields": {
+								"name": {
+									"title": "Name",
+									"placeholder": "{type} Animation"
+								},
+								"type": {
+									"title": "Type"
+								}
+							},
+							"complete": "Create New Animation Set"
+						}
+					},
+					"folder": {
+						"button": "Create Folder"
+					}
+				},
+				"search": {
+					"label": "Search Animation Sets",
+					"placeholder": "Search Animation Sets"
+				},
+				"list": {
+					"alias": "Alias of <code>{rollOption}</code>",
+					"empty": "Empty",
+					"unknownUser": "Unknown"
+				},
+				"moduleAnimationSets": "Module Animation Sets",
+				"disabled": {
+					"global": "Disabled for everyone by the GM.",
+					"users": "Disabled for {users}."
+				}
+			},
+			"playlists": {
+				"volumeSlider": {
+					"title": "Animations",
+					"tooltip": "Controls the volume of sounds created by <i>PF2e Graphics</i>."
+				},
+				"error": {
+					"noVolume": "There is no volume setting?!"
+				}
+			}
+		},
+		"document": {
+			"title": "Configure Animation Set",
+			"error": {
+				"noData": "<code>AnimationDocument</code> sheet was opened without a provided animation set!"
+			}
+		},
+		"history": {
+			"controlsButton": {
+				"tooltip": "Animation History"
+			},
+			"window": {
+				"title": "Animation History",
+				"search": "Search",
+				"data": {
+					"summary": "<code>{trigger}</code> triggered by {name}",
+					"count": {
+						"many": "{count} animation sets",
+						"one": "1 animation set",
+						"zero": "No animation sets"
+					},
+					"actor": {
+						"header": "Actors"
+					},
+					"trigger": {
+						"header": "Triggers"
+					},
+					"user": {
+						"header": "User",
+						"unknown": "Unknown"
+					},
+					"triggerContext": {
+						"header": "Context"
+					}
+				},
+				"clear": "Clear"
+			}
+		},
+		"jsonEditor": {
+			"title": {
+				"editable": "JSON Editor",
+				"readOnly": "JSON Viewer (read-only)"
+			}
+		},
+		"settings": {
+			"cardsGone": {
+				"name": "Hide Cards Tab",
+				"hint": "Hides the cards tab, effectively making the animations tab replace it."
+			},
+			"volume": {
+				"name": "Animation Volume",
+				"hint": "Multiplies the volume of animations by a set amount. Does not override animations own volume settings."
+			},
+			"history": {
+				"name": "Show Animation History to Players",
+				"hint": "Animation History contains sensitive information, primarily about roll options. Enable this if you dont worry about players reading what kind of traits or abilities an NPC might have."
+			},
+			"showHiddenRolls": {
+				"name": "Animate Blind Rolls",
+				"hint": "Enables animations to be triggered by blind rolls. This is false by default to prevent metagaming."
+			},
+			"delay": {
+				"name": "Animation Delay",
+				"hint": "Adds a delay in seconds to every animation being processed and triggered."
+			},
+			"persistent": {
+				"name": "Persistent Animations",
+				"hint": "Enables persistent (looping) animations. Please note this can *SIGNIFICANTLY* reduce performance the more effects you have on screen. When turned off, premade animations will animate only once and possibly on start or end of turn."
+			},
+			"quality": {
+				"name": "Performance Settings",
+				"hint": "What level of detail animations should have. Some animations may be more hardware-demanding, requiring you to lower this setting.",
+				"0": "Minimum",
+				"1": "Low",
+				"2": "Medium",
+				"3": "High"
+			},
+			"buttonPosition": {
+				"name": "Actor Button Position",
+				"hint": "Where the button for managing Actor Graphics should be located. Change it if you have too many modules adding header buttons.",
+				"0": "Header",
+				"1": "Sheet",
+				"2": "Header (minimized)"
+			},
+			"dev": {
+				"name": "Developer Mode",
+				"hint": "Enables console logs. Helpful when you are trying to make your own animations. Also adds new settings, visible on refresh."
+			},
+			"jb2aMode": {
+				"name": "[DEV] JB2A Mode",
+				"hint": "Switch between free or patreon version for the purposes of predicates.",
+				"free": "Free",
+				"patreon": "Patreon"
+			},
+			"suppressWarnings": {
+				"name": "[DEV] Suppress Startup Warnings",
+				"hint": "Enable this setting if you are using an alternative source for animations than JB2A.",
+				"warnFremium": "You have JB2A (Free) but have not enabled it, please enable it for PF2e Graphics to function as expected.",
+				"warnPremium": "You have JB2A (Patreon) but have not enabled it, please enable it for PF2e Graphics to function as expected.",
+				"warnNone": "You don't have JB2A installed, please install and enable it in order for PF2e Graphics to function!"
+			}
+		},
+		"execute": {
+			"common": {
+				"error": {
+					"missingPayload": "Payload missing—your data may be corrupted.",
+					"unimplemented": "Failed to execute <code>{payloadType}</code> payload ({unimplemented} unimplemented).",
+					"unknownDiscriminatedUnionValue": "Failed to execute <code>{payloadType}</code> payload (unknown <code>{property}</code>).",
+					"unknownEnumArrayElement": "Failed to execute <code>{payloadType}</code> payload (unknown <code>{property}</code> element).",
+					"unknownPosition": "Couldn't resolve position <code>{position}</code>.",
+					"tooMuchRecursion": "Animation for <code>{rollOption}</code> recurses too many times! Do its references form an infinite loop?",
+					"cantFindReference": "Couldn't find referenced payload for {rollOption}—run validation scripts to verify.",
+					"catastrophicError": "Execution failed (fatal error in <code>decodePayload()</code>!).",
+					"unknownSize": "Unknown actor size <code>{size}</code>.",
+					"incompatibleValue": "Failed to execute <code>{payloadType}</code> payload (<code>{property1}</code> is incompatible with <code>{property2}</code>).",
+					"schema": "Execution failed (unresolvable schema error reached)."
+				}
+			},
+			"animation": {
+				"error": {
+					"noActor": "Failed to execute <code>animation</code> on <b>{name}</b> (couldn't find actor).",
+					"unownedToken": "Failed to execute <code>animation</code> payload on <b>{name}</b> (you don't own this token)."
+				}
+			},
+			"crosshair": {
+				"error": {
+					"noName": "Failed to execute a <code>crosshair</code> payload (no <code>name</code> provided).",
+					"noActor": "Failed to execute a <code>crosshair</code> payload (couldn't find actor for source token <b>{token}</b>).",
+					"unresolvedPosition": "Failed to execute a <code>crosshair</code> payload (couldn't resolve position).",
+					"noToken": "Failed to execute a <code>crosshair</code> payload (couldn't find token)."
+				},
+				"notifications": {
+					"pickALocation": "Click on the canvas to choose a position!",
+					"interrupted": "Payload interrupted due to cancelled crosshair. Use the Effect Manager to remove any remaining graphics/sounds."
+				}
+			},
+			"graphic": {
+				"error": {
+					"mismatchedPositionSize": "Failed to execute <code>graphic</code> payload (mismatched <code>position</code> and <code>size</code>).",
+					"cantFindPlaceableForRelativeScaling": "Failed to execute <code>graphic</code> payload (couldn't find placeable for scaling).",
+					"cantIdentifyPlaceableForRelativeScaling": "Failed to execute <code>graphic</code> payload (couldn't identify placeable for scaling)."
+				}
+			}
+		},
+		"tokenConfig": {
+			"effectiveSize": {
+				"name": "Effective Size",
+				"tooltip": "If your token is an unusual size (e.g. a Medium token that is 1.2 grid-squares wide), set how many grid-squares its ring covers. See the <i>PF2e Graphics</i> wiki for more information."
+			}
+		},
+		"explanations": {
+			"rollOption": "The roll option that activates this animation set (e.g. <code>item:slug:jaws</code> or <code>check:statistic:society</code>).<p />Your choice should be specific to the thing you're animating. If in doubt, use the <b>Animation History</b> to find an appropriate roll option for your action.",
+			"triggers": "A list of triggers that will cause this animation to be executed.",
+			"overrides": "A list of roll options, with each roll option corresponding to an animation's primary predicate. If two animations are triggered by the same trigger and one of them overrides the other, the overridden animation will not be executed.",
+			"predicates": "A list of predicates as per the pf2e system. The animation will only be executed if the predicates apply.",
+			"label": "A case-sensitive string that exists so that other entities can reference it, particularly when another payload `removes` it. This should be reasonably unique to avoid collissions.",
+			"removes": "A list of Label strings that when this set is executed, any matching sets are interrupted and removed.<p/>In addition to using a regular Label, you can also use the fixed strings \"ALL_ON_SOURCES\", \"ALL_ON_TARGETS\", and \"ALL_ON_TEMPLATES\", which removes all ongoing effects on the source or target tokens respectively.",
+			"execute": "Execute is the main meat of a given animation set. It dictates whether a given set creates an graphical effect, plays a sound, lets you place a crosshair, animates a token, or executes a macro.",
+			"crosshair": {
+				"name": "TODO: Explain name",
+				"label": "TODO: Explain label",
+				"template": "TODO: Explain template",
+				"relativeTo": "TODO: Explain relativeTo",
+				"padding": "TODO: Explain padding",
+				"defaultSize": "TODO: Explain defaultSize",
+				"minSize": "TODO: Explain minSize",
+				"maxSize": "TODO: Explain maxSize",
+				"angle": "TODO: Explain angle",
+				"direction": "TODO: Explain direction",
+				"width": "TODO: Explain width",
+				"snapDirection": "TODO: Explain snapDirection",
+				"snapLocation": "TODO: Explain snapLocation",
+				"lockDrag": "TODO: Explain lockDrag",
+				"lockRotation": "TODO: Explain lockRotation",
+				"noGridHighlight": "TODO: Explain noGridHighlight"
+			}
+		},
+		"tours": {
+			"sidebar": {
+				"title": "New Interface Elements",
+				"description": "Introduces you to the changes <i>PF2e Graphics</i> makes to the sidebar and canvas controls.",
+				"steps": {
+					"1:intro": {
+						"title": "Welcome!",
+						"content": "Welcome to <i>PF2e Graphics</i>! This quick tour will show you how to use the module."
+					},
+					"2:animationSetsTabButton": {
+						"title": "Animation Sets",
+						"content": "This new sidebar button switches to the <i>Animation Sets</i> tab.\nLet's open it up!"
+					},
+					"3:animationSetsTab": {
+						"title": "Animation Sets",
+						"content": "The Animation Sets tab is just like the Actors or Items tab, except it contains animation sets instead!\nAn 'animation set' is what <i>PF2e Graphics</i> calls the complete batch of graphics, sounds, and other magic that gets played when something happens."
+					},
+					"4:bundledAnimationSets": {
+						"title": "Animation Sets",
+						"content": "Down here is a special folder containing all the pre-made animation sets bundled with <i>PF2e Graphics</i>. You can't add, remove, or edit them directly, but they're still available for inspection.\nIf you've activated another module which integrates with <i>PF2e Graphics</i>, you'll find its animation sets here too. The icon at the top-right of each document tells you where it's from."
+					},
+					"5:customAnimationSets": {
+						"title": "Animation Sets",
+						"content": "Up here is (or will be!) all the custom animation sets in your world. An icon at the top-right of each item tells you whether it's in the 'user scope' (only triggered by you) or 'world scope' (can be triggered by anyone).\nCustom animation sets take priority over modules' sets."
+					},
+					"6:animationHistory": {
+						"title": "Animation History",
+						"content": "This little button opens up the 'Animation History' window.\nWhenever something happens that could trigger <i>PF2e Graphics</i>, an entry gets made in the Animation History. You can use this to figure out triggers and roll options when creating your own custom animation sets—just do the thing you want and see what gets logged!"
+					},
+					"7:animationSetsVolumeSlider": {
+						"title": "Sound Controls",
+						"content": "Over here in the Playlists tab, <i>PF2e Graphics</i> also adds a new volume slider. This allows you to control the volume of the sounds <i>PF2e Graphics</i> plays.\nNote that this is actually the same slider as in <i>PF2e Graphics</i>' own module settings—it's just here for convenience!"
+					},
+					"8:thanks": {
+						"title": "That's it!",
+						"content": "If you have any questions, take a read of our <a href=\"https://github.com/MrVauxs/pf2e-graphics/wiki\">wiki</a>, or ask us directly on <a href=\"https://discord.com/invite/SajryVzCyf\">Discord</a> (look for the <b><code>#PF2e Graphics</code></b> thread within <b><code>#pf2e-modules</code></b>).\nThank you for using the module! <a href=\"https://ko-fi.com/mrvauxs\" target=\"_blank\"><i class=\"fas fa-mug-hot ko-fi\"></i> Ko-fi</a>"
+					}
+				}
+			}
+		},
+		"messages": {
+			"tourNag": {
+				"header": "Welcome to <i>PF2e Graphics!</i>",
+				"body": "For the most part, <i>PF2e Graphics</i> operates silently in the background; you don't need to do anything to get started. However, if you want to get stuck in with customisation, we've prepared some guides. <i>So</i>, with that in mind...",
+				"doYouWantATour": "Do you want a tour? :)",
+				"buttons": {
+					"seeAllTours": "See all tours",
+					"neverSpeakToMeAgain": "Never speak to me again. >:("
+				},
+				"farewellToast": "The tours are always available via the Tour Management button. We'll be back only if there's new feature to tell you about! 😊"
+			}
+		}
+	}
+}

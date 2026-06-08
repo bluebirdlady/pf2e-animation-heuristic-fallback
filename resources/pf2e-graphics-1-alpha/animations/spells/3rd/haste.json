@@ -1,0 +1,24 @@
+{
+	"effect:haste": [
+		{
+			"execute": {
+				"type": "graphic",
+				"graphic": [
+					"graphics-vfx.rpg.accelerate"
+				],
+				"position": {
+					"type": "dynamic",
+					"location": "SOURCES"
+				},
+				"size": {
+					"type": "relative",
+					"relativeTo": "SOURCES",
+					"scaling": 1.2
+				}
+			},
+			"triggers": [
+				"effect"
+			]
+		}
+	]
+}

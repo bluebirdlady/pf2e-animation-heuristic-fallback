@@ -1,0 +1,35 @@
+name: Format animations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - animations/**/*.json
+
+jobs:
+  format-animations:
+    name: Format animation JSONs
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        run: bun install
+
+      - name: Format animation JSONs
+        run: bun run build:clean
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 🎨 Format animation JSONs
+          #   file_pattern: animations/**/*.json

@@ -1,0 +1,326 @@
+{
+	"pf2e-graphics": {
+		"support": {
+			"1": "Przekaż darowiznę!",
+			"2": "Wesprzyj mnie!",
+			"3": "Pomóż autorowi",
+			"4": "Daj napiwek",
+			"5": "Podoba ci się moduł?"
+		},
+		"presetTypes": {
+			"ranged": "Dystans",
+			"melee": "Walka Wręcz",
+			"onToken": "Na token",
+			"template": "Szablon",
+			"custom": "Niestandardowe"
+		},
+		"scopes": {
+			"scope": "Zakres",
+			"full": {
+				"core": "Zakres podstawowy",
+				"module": "Zakres modułu",
+				"world": "Zakres świata",
+				"user": "Zakres użytkownika",
+				"item": "Zakres przedmiotu"
+			},
+			"short": {
+				"core": "Główny",
+				"module": "Moduł",
+				"world": "Świat",
+				"user": "Użytkownik",
+				"item": "Przedmiot"
+			}
+		},
+		"load": {
+			"notify": {
+				"componentUpdated": "<code>{component}</code> zaktualizowano!",
+				"animationSetsUpdated": "Zaktualizowano zestawy animacji!"
+			},
+			"error": {
+				"badModuleFlags": "Nie udało się odczytać flag pakietów dla modułu {title} (<code>{id}</code>).",
+				"badModuleAnimations": "Nie udało się załadować zestawów animacji dla {title} (<code>{id}</code>). Zobacz konsolę (<kbd>F12</kbd>) aby uzyskać więcej informacji.",
+				"badMessageFlags": "Nie udało się odczytać flag modułu <code>ChatMessage</code> (otrzymano <code>{flags}</code>).",
+				"cantAccessFile": "Nie można uzyskać dostępu do pliku `{path}`.",
+				"schemaValidationFailed": "{number} zestawów animacji nie przeszły walidacji! Zobacz konsolę (<kbd>F12</kbd>) aby uzyskać więcej informacji."
+			}
+		},
+		"sidebar": {
+			"animationSets": {
+				"title": "Zestawy animacji",
+				"tooltip": "Zestawy animacji",
+				"create": {
+					"animationSet": {
+						"button": "Utwórz zestaw animacji",
+						"popup": {
+							"title": "Utwórz zestaw animacji",
+							"fields": {
+								"name": {
+									"title": "Nazwa",
+									"placeholder": "Animacja typu {type}"
+								},
+								"type": {
+									"title": "Typ"
+								}
+							},
+							"complete": "Utwórz nowy zestaw animacji"
+						}
+					},
+					"folder": {
+						"button": "Utwórz folder"
+					}
+				},
+				"search": {
+					"label": "Wyszukiwanie zestawów animacji",
+					"placeholder": "Wyszukiwanie zestawów animacji"
+				},
+				"list": {
+					"alias": "Alias <code>{rollOption}</code>",
+					"empty": "Pusty",
+					"unknownUser": "Nieznany"
+				},
+				"moduleAnimationSets": "Zestawy animacji modułów",
+				"disabled": {
+					"global": "Wyłączony dla wszystkich przez MG.",
+					"users": "Wyłączony dla {users}."
+				}
+			},
+			"playlists": {
+				"volumeSlider": {
+					"title": "Animacje",
+					"tooltip": "Kontroluje głośność dźwięków generowanych przez <i>PF2e Graphics</i>."
+				},
+				"error": {
+					"noVolume": "Nie ma ustawień głośności?"
+				}
+			}
+		},
+		"document": {
+			"title": "Konfiguracja zestawu animacji",
+			"error": {
+				"noData": "Karta <code>AnimationDocument</code> została otwarta bez dostarczonego zestawu animacji!"
+			}
+		},
+		"history": {
+			"controlsButton": {
+				"tooltip": "Historia animacji"
+			},
+			"window": {
+				"title": "Historia animacji",
+				"search": "Wyszukiwanie",
+				"data": {
+					"summary": "<code>{trigger}</code> wyzwalany przez {name}",
+					"count": {
+						"many": "{count} zestawów animacji",
+						"one": "1 zestaw animacji",
+						"zero": "Brak zestawów animacji"
+					},
+					"actor": {
+						"header": "Aktorzy"
+					},
+					"trigger": {
+						"header": "Wyzwalacze"
+					},
+					"user": {
+						"header": "Użytkownik",
+						"unknown": "Nieznany"
+					},
+					"triggerContext": {
+						"header": "Kontekst"
+					}
+				},
+				"clear": "Wyczyść"
+			}
+		},
+		"jsonEditor": {
+			"title": {
+				"editable": "Edytor JSON",
+				"readOnly": "Przeglądarka JSON (tylko do odczytu)"
+			}
+		},
+		"settings": {
+			"cardsGone": {
+				"name": "Ukryj zakładkę Kart",
+				"hint": "Ukrywa zakładkę kart, skutecznie zastępując ją kartą animacji."
+			},
+			"volume": {
+				"name": "Głośność animacji",
+				"hint": "Mnoży głośność animacji przez określoną wartość. Nie zastępuje własnych ustawień głośności animacji."
+			},
+			"history": {
+				"name": "Wyświetl historię animacji graczom",
+				"hint": "Historia animacji zawiera poufne informacje, głównie o opcjach rzutu. Włącz tę opcję, jeśli nie martwisz się, że gracze odczytają, jakie cechy lub umiejętności może mieć BN."
+			},
+			"showHiddenRolls": {
+				"name": "Animacja ukrytych rzutów",
+				"hint": "Umożliwia uruchamianie animacji przez ukryte rzuty. Domyślnie jest wyłączona, aby zapobiec metagamingowi."
+			},
+			"delay": {
+				"name": "Opóźnienie animacji",
+				"hint": "Dodaje opóźnienie w sekundach do każdej przetwarzanej i uruchamianej animacji."
+			},
+			"persistent": {
+				"name": "Trwałe animacje",
+				"hint": "Włącza trwałe (zapętlone) animacje. Należy pamiętać, że może to *ZNACZNIE* zmniejszyć wydajność, im więcej efektów znajduje się na ekranie. Po wyłączeniu, gotowe animacje będą animowane tylko raz i ewentualnie na początku lub na końcu tury."
+			},
+			"quality": {
+				"name": "Ustawienia wydajności",
+				"hint": "Poziom szczegółowości animacji. Niektóre animacje mogą być bardziej wymagające sprzętowo, co wymaga obniżenia tego ustawienia.",
+				"0": "Minimum",
+				"1": "Niskie",
+				"2": "Średnie",
+				"3": "Wysokie"
+			},
+			"buttonPosition": {
+				"name": "Położenie przycisku aktora",
+				"hint": "W tym miejscu powinien znajdować się przycisk do zarządzania grafikami aktorów. Zmień go, jeśli masz zbyt wiele modułów dodających przyciski nagłówka.",
+				"0": "Nagłówek",
+				"1": "Karta",
+				"2": "Nagłówek (zminimalizowany)"
+			},
+			"dev": {
+				"name": "Tryb dewelopera",
+				"hint": "Włącza logi konsoli. Przydatne podczas tworzenia własnych animacji. Dodaje także nowe ustawienia, widoczne przy odświeżaniu."
+			},
+			"jb2aMode": {
+				"name": "[DEV] Tryb JB2A",
+				"hint": "Przełączanie między wersją darmową a patreon dla celów predykatów.",
+				"free": "Darmowy",
+				"patreon": "Patreon"
+			},
+			"suppressWarnings": {
+				"name": "[DEV] Wyłączenie ostrzeżeń o uruchomieniu",
+				"hint": "Włącz to ustawienie, jeśli używasz alternatywnego źródła animacji niż JB2A.",
+				"warnFremium": "Masz JB2A (Free), ale go nie włączyłeś, włącz go, aby PF2e Graphics działał zgodnie z oczekiwaniami.",
+				"warnPremium": "Masz JB2A (Patreon), ale go nie włączyłeś, włącz go, aby PF2e Graphics działało zgodnie z oczekiwaniami.",
+				"warnNone": "Nie masz zainstalowanego JB2A, zainstaluj i włącz go, aby PF2e Graphics działało!"
+			}
+		},
+		"execute": {
+			"common": {
+				"error": {
+					"missingPayload": "Brak zawartości - dane mogą być uszkodzone.",
+					"unimplemented": "Nie udało się wykonać zawartości <code>{payloadType}</code> ({unimplemented} niewdrożony).",
+					"unknownDiscriminatedUnionValue": "Nie udało się wykonać zawartości <code>{payloadType}</code> (nieznany <code>{property}</code>).",
+					"unknownEnumArrayElement": "Nie udało się wykonać zawartości <code>{payloadType}</code> (nieznany element <code>{property}</code>).",
+					"unknownPosition": "Nie udało się ustalić pozycji <code>{position}</code>.",
+					"tooMuchRecursion": "Animacja dla <code>{rollOption}</code> powraca zbyt wiele razy! Czy jego referencje tworzą nieskończoną pętlę?",
+					"cantFindReference": "Nie można znaleźć zawartości odniesienia dla {rollOption} - uruchom skrypty sprawdzania poprawności, aby zweryfikować.",
+					"catastrophicError": "Wykonanie nie powiodło się (błąd krytyczny w <code>decodePayload()</code>!).",
+					"unknownSize": "Nieznany rozmiar aktora <code>{size}</code>.",
+					"incompatibleValue": "Nie udało się wykonać zawartości <code>{payloadType}</code> (<code>{property1}</code> jest niekompatybilny z <code>{property2}</code>).",
+					"schema": "Wykonanie nie powiodło się (wystąpił nierozwiązywalny błąd schematu)."
+				}
+			},
+			"animation": {
+				"error": {
+					"noActor": "Nie udało się wykonać <code>animacji</code> na <b>{name}</b> (nie udało się znaleźć aktora).",
+					"unownedToken": "Nie udało się wykonać zawartości <code>animacji</code> na <b>{name}</b> (nie jesteś właścicielem tego tokena)."
+				}
+			},
+			"crosshair": {
+				"error": {
+					"noName": "Nie udało się wykonać zawartości <code>celownika</code> (brak <code>nazwy</code>).",
+					"noActor": "Nie udało się wykonać zawartości <code>celownika</code> (nie można znaleźć aktora dla tokena źródłowego <b>{token}</b>).",
+					"unresolvedPosition": "Nie udało się wykonać zawartości <code>celownika</code> (nie udało się ustalić pozycji).",
+					"noToken": "Nie udało się wykonać zawartości <code>celownika</code> (nie można znaleźć tokena)."
+				},
+				"notifications": {
+					"pickALocation": "Kliknij na płótno, aby wybrać pozycję!",
+					"interrupted": "Przerwano załadunek z powodu anulowania celownika. Użyj Menedżera efektów, aby usunąć wszelkie pozostałe grafiki/dźwięki."
+				}
+			},
+			"graphic": {
+				"error": {
+					"mismatchedPositionSize": "Nie udało się wykonać zawartości<code>grafiki</code> (niedopasowana <code>pozycja</code> i <code>rozmiar</code>).",
+					"cantFindPlaceableForRelativeScaling": "Nie udało się wykonać zawartości <code>grafiki</code> (Nie można znaleźć miejsca do skalowania).",
+					"cantIdentifyPlaceableForRelativeScaling": "Nie udało się wykonać zawartości <code>grafiki</code> (nie można określić miejsca do skalowania)."
+				}
+			}
+		},
+		"tokenConfig": {
+			"effectiveSize": {
+				"name": "Efektywny rozmiar",
+				"tooltip": "Jeśli token ma nietypowy rozmiar (np. średni token o szerokości 1,2 kwadratu siatki), ustaw liczbę kwadratów siatki, które pokrywa jego pierścień. Zobacz wiki <i>PF2e Graphics</i> aby uzyskać więcej informacji."
+			}
+		},
+		"explanations": {
+			"rollOption": "Opcja rzutu, która aktywuje ten zestaw animacji (np. <code>item:slug:jaws</code> lub <code>check:statistic:society</code>).<p />Wybór powinien być dostosowany do animowanej rzeczy. Jeśli masz wątpliwości, użyj opcji <b>Historia animacji</b> aby znaleźć odpowiednią opcję rzutu dla danej akcji.",
+			"triggers": "Lista wyzwalaczy, które spowodują wykonanie tej animacji.",
+			"overrides": "Lista opcji rzutów, z których każda odpowiada głównemu predykatowi animacji. Jeśli dwie animacje są wyzwalane przez ten sam wyzwalacz i jedna z nich zastępuje drugą, nadrzędna animacja nie zostanie wykonana.",
+			"predicates": "Lista predykatów zgodnie z systemem pf2e. Animacja zostanie wykonana tylko wtedy, gdy te warunki mają zastosowanie.",
+			"label": "Ciąg znaków rozróżniający wielkość liter, który istnieje, aby inne jednostki mogły się do niego odwoływać, szczególnie gdy inny ładunek go usuwa. Powinien być wystarczająco unikalny, aby uniknąć kolizji.",
+			"removes": "Lista łańcuchów etykiet, które podczas wykonywania tego zestawu są przerywane i usuwane z pasujących zestawów.<p/>Oprócz użycia zwykłej etykiety, można również użyć stałych ciągów „ALL_ON_SOURCES”, „ALL_ON_TARGETS” i „ALL_ON_TEMPLATES”, które usuwają wszystkie trwające efekty odpowiednio dla tokenów źródłowych lub docelowych.",
+			"execute": "Wykonanie jest głównym elementem danego zestawu animacji. Określa, czy dany zestaw tworzy efekt graficzny, odtwarza dźwięk, pozwala umieścić celownik, animuje token lub wykonuje makro.",
+			"crosshair": {
+				"name": "TODO: Wyjaśnienie nazwę",
+				"label": "TODO: Wyjaśnienie etykietę",
+				"template": "TODO: Wyjaśnienie szablonu",
+				"relativeTo": "TODO: Wyjaśnienie relativeTo",
+				"padding": "TODO: Wyjaśnienie wypełnienia",
+				"defaultSize": "TODO: Wyjaśnienie defaultSize",
+				"minSize": "TODO: Wyjaśnienie minSize",
+				"maxSize": "TODO: Wyjaśnienie maxSize",
+				"angle": "TODO: Wyjaśnienie kąt",
+				"direction": "TODO: Wyjaśnienie kierunek",
+				"width": "TODO: Wyjaśnienie szerokość",
+				"snapDirection": "TODO: Wyjaśnienie snapDirection",
+				"snapLocation": "TODO: Wyjaśnienie snapLocation",
+				"lockDrag": "TODO: Wyjaśnienie lockDrag",
+				"lockRotation": "TODO: Wyjaśnienie lockRotation",
+				"noGridHighlight": "TODO: Wyjaśnienie noGridHighlight"
+			}
+		},
+		"tours": {
+			"sidebar": {
+				"title": "Nowe elementy interfejsu",
+				"description": "Przedstawia zmiany, jakie <i>PF2e Graphics</i> wprowadza do paska bocznego i elementów sterujących płótna.",
+				"steps": {
+					"1:intro": {
+						"title": "Witamy!",
+						"content": "Witamy w <i>PF2e Graphics</i>! Ta krótka wycieczka pokaże ci, jak korzystać z modułu."
+					},
+					"2:animationSetsTabButton": {
+						"title": "Zestawy animacji",
+						"content": "Ten nowy przycisk na pasku bocznym przełącza do zakładki <i>Zestawy animacji</i>.\nOtwórzmy ją!"
+					},
+					"3:animationSetsTab": {
+						"title": "Zestawy animacji",
+						"content": "Zakładka Zestawy animacji jest podobna do zakładki Aktorzy lub Przedmioty, z tą różnicą, że zawiera zestawy animacji!\n„Zestaw animacji” jest tym, co <i>PF2e Graphics</i> nazywa kompletną partią grafiki, dźwięków i innej magii, która jest odtwarzana, gdy coś się dzieje."
+					},
+					"4:bundledAnimationSets": {
+						"title": "Zestawy animacji",
+						"content": "Tutaj znajduje się specjalny folder zawierający wszystkie gotowe zestawy animacji dołączone do <i>PF2e Graphics</i>. Nie można ich bezpośrednio dodawać, usuwać ani edytować, ale są one nadal dostępne do wglądu.\nJeśli aktywowałeś inny moduł, który integruje się z <i>PF2e Graphics</i>, znajdziesz tutaj również jego zestawy animacji. Ikona w prawym górnym rogu każdego dokumentu informuje, skąd pochodzi."
+					},
+					"5:customAnimationSets": {
+						"title": "Zestawy animacji",
+						"content": "Tutaj znajdują się (lub będą!) wszystkie niestandardowe zestawy animacji w twoim świecie. Ikona w prawym górnym rogu każdego elementu informuje, czy znajduje się on w „zakresie użytkownika” (uruchamiany tylko przez ciebie), czy „zakresie świata” (może być uruchamiany przez każdego).\nNiestandardowe zestawy animacji mają pierwszeństwo przed zestawami modułów."
+					},
+					"6:animationHistory": {
+						"title": "Historia animacji",
+						"content": "Ten mały przycisk otwiera okno „Historia animacji”.\nZa każdym razem, gdy wydarzy się coś, co może uruchomić <i>PF2e Graphics</i>, dokonywany jest wpis w Historii animacji. Można to wykorzystać do określenia wyzwalaczy i opcji rzutów podczas tworzenia własnych niestandardowych zestawów animacji - po prostu zrób to, co chcesz i zobacz, co zostanie zarejestrowane!"
+					},
+					"7:animationSetsVolumeSlider": {
+						"title": "Sterowanie dźwiękiem",
+						"content": "W zakładce Playlisty, <i>PF2e Graphics</i> dodaje również nowy suwak głośności. Pozwala on kontrolować głośność odtwarzanych przez <i>PF2e Graphics</i> dźwięków.\nNależy pamiętać, że jest to w rzeczywistości ten sam suwak, co w ustawieniach modułu <i>PF2e Graphics</i> — jest tu tylko dla wygody!"
+					},
+					"8:thanks": {
+						"title": "To wszystko!",
+						"content": "Jeśli masz jakieś pytania, przeczytaj nasze <a href=\"https://github.com/MrVauxs/pf2e-graphics/wiki\">wiki</a>, lub zapytaj nas bezpośrednio na <a href=\"https://discord.com/invite/SajryVzCyf\">Discordzie</a> (szukaj wątku <b><code>#PF2e Graphics</code></b> w ramach <b><code>#pf2e-modules</code></b>).\nDziękujemy za korzystanie z modułu! <a href=\"https://ko-fi.com/mrvauxs\" target=\"_blank\"><i class=\"fas fa-mug-hot ko-fi\"></i> Ko-fi</a>"
+					}
+				}
+			}
+		},
+		"messages": {
+			"tourNag": {
+				"header": "Witamy w <i>PF2e Graphics!</i>",
+				"body": "W większości, <i>PF2e Graphics</i> działa dyskretnie w tle; nie musisz nic robić, aby rozpocząć. Jeśli jednak chcesz utknąć w dostosowywaniu, przygotowaliśmy kilka przewodników. <i>Więc</i>, mając to na uwadze...",
+				"doYouWantATour": "Chcesz wziąć udział w przewodniku? :)",
+				"buttons": {
+					"seeAllTours": "Zobacz wszystkie przewodniki",
+					"neverSpeakToMeAgain": "Nigdy więcej się do mnie nie odzywaj. >:("
+				},
+				"farewellToast": "Przewodniki są zawsze dostępne za pomocą przycisku Zarządzanie przewodnikami. Wrócimy tylko wtedy, gdy pojawi się nowa funkcja, o której będziemy mogli opowiedzieć! 😊"
+			}
+		}
+	}
+}

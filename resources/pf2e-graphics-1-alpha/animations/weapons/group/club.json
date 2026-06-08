@@ -1,0 +1,62 @@
+{
+	"item:group:club": [
+		{
+			"predicates": [
+				"melee",
+				{
+					"gt": [
+						"target:distance",
+						0
+					]
+				}
+			],
+			"triggers": [
+				"attack-roll"
+			],
+			"contents": [
+				{
+					"execute": {
+						"type": "graphic",
+						"graphic": [
+							"jb2a.melee_attack.02.club"
+						],
+						"position": {
+							"type": "static",
+							"location": "SOURCES",
+							"anchor": {
+								"x": 0.4
+							}
+						},
+						"reflection": {
+							"y": "random"
+						},
+						"size": {
+							"type": "relative",
+							"relativeTo": "SOURCES",
+							"scaling": 5
+						},
+						"rotation": {
+							"type": "relative",
+							"location": "TARGETS"
+						}
+					}
+				},
+				{
+					"execute": {
+						"type": "sound",
+						"sound": [
+							"graphics-sfx.generic.hit.blunt"
+						],
+						"delay": 500,
+						"radius": 32.5,
+						"constrainedByWalls": true,
+						"audioChannel": "environment",
+						"position": {
+							"location": "TARGETS"
+						}
+					}
+				}
+			]
+		}
+	]
+}

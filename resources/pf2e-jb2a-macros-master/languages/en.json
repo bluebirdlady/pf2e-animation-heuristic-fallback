@@ -1,0 +1,133 @@
+{
+	"pf2e-jb2a-macros": {
+		"updateMenu": {
+			"deleted": "The following effects will be DELETED from a previous version of 'PF2e Animations'.",
+			"added": "The following effects are going to be added to your Autorecognition settings.",
+			"custom": "The following effects won't be added due to them already existing from an unknown source.",
+			"customHint": "If you want the 'PF2e Animations' version, delete them from your Autorecognition Menu.",
+			"updated": "The following effects will be updated from a previous version of 'PF2e Animations' (or from Automated Animations default menu).",
+			"nothing": "No updates were found.",
+			"blacklisted": "The following effects have been blacklisted and will be removed from your Autorecognition Menu.",
+			"warning": "Make sure to backup your autorecognition menu! THIS PROCESS IS IRREVERSIBLE.",
+			"debugCustom": "The following effects do not exist in PF2e Animations, they are completely new and will remain in your Autorecognition Menu."
+		},
+		"notifications": {
+			"killAnimationsOnKill": "Removed animations from defeated combatant \"{name}\".",
+			"unevenGrid": "Your scene's grid is uneven ({grid}px). This will likely cause your target location to be offset!",
+			"gridless": "Crosshairs are recommended to be used only on a grid-based scene. Gridless scenes can cause issues.",
+			"wrongVersion": "You are missing <b>{modules}</b> for PF2e Animations to fully function! Please update the modules listed!",
+			"noDependencies": "You are missing <b>{modules}</b> for PF2e Animations to fully function! Please enable the modules listed!",
+			"noJB2A": "You need a <a href=\"https://jb2a.com/home/content-information/#free_library\">JB2A module</a> enabled to use with PF2e Animations module!",
+			"update": "PF2e Animations v{version} loaded. Please check if you don't have new animations to be added to your autorecognition menu!",
+			"noToken": "No source token found.",
+			"noDummy": "Missing dummy actors for summoning macros.",
+			"creatingDummy": " Creating dummy NPCs… ",
+			"outOfRange": "Target is out of range.",
+			"noPack": "Can't find 'pf2e-jb2a-macros.Actions' pack, somehow?",
+			"tooManyArgs": "Too many arguments for this macro! The following arguments are incompatible: {issues}",
+			"noPrem": "You are missing the <a href='https://www.patreon.com/JB2A/membership'>premium version of JB2A assets</a> to use this animation!",
+			"metaData": "This animation WILL be replaced when updated. If you don't want it to be, best way is to temporarily change it's <b>animation</b> or <b>variant</b> to something else, or enabling Debug mode in the settings and pressing the Metadata button again."
+		},
+		"macro": {
+			"outOfRange": "Out of Range!",
+			"suddenCharge": {
+				"notif": "Sudden Charge! Select where you want to move. Right click to cancel.",
+				"suddenCharge": "Sudden Charge"
+			},
+			"disguise": {
+				"humanoidForm": "🎭Humanoid Form🎭",
+				"illusoryDisguise": "🎭Illusory Disguise🎭",
+				"cast": "Cast!",
+				"name": "Name",
+				"tokenImage": "Token Image",
+				"tokenImageHint": "Make sure it works on the scene, CORS is a fickle god.",
+				"tokenScale": "Token Scale",
+				"tokenScaleHint": "In case the token you are going into is a pop-out token. Or is smaller than you!",
+				"invisible": "Turn your original token invisible?",
+				"invisibleHint": "Enabled by default, this hides the token under the disguise. Useful for disguising into a smaller or a top-down token."
+			},
+			"summoning": {
+				"player": {
+					"unique": "The filters are uniquely set as per {unique}.",
+					"dancingLights": "Select your dancing lights…",
+					"sorted": "Sorted by level and alphabetically.",
+					"nameArg": "Filtered by name: <b>{name}</b>.",
+					"summonArg": "Filtered by level <b>(max. level {multiplier} from {spellLevel} level spell)</b>.",
+					"levelArg": "Filtered by level <b>{level1} and above, up to {level2}</b>.",
+					"traitsArg": "Filtered by traits: <b>{traits}</b>.",
+					"hasImageArg": "Filtered by whether a creature has an <b>image</b>.",
+					"uncommonArg": "<b>Uncommon or higher rarity</b> picks allowed.",
+					"sourceArg": "Filtered by source: <b>{sources}</b>.",
+					"label": "Sorted with…?",
+					"creature": "Creature",
+					"nothingFound": "Nothing found. Refine your filter arguments!",
+					"amount": "Amount",
+					"title": "Summon Anything",
+					"level": "Level {level}"
+				},
+				"gm": {
+					"title": "Player Summon Request",
+					"unknownUser": "An unknown user",
+					"declined": "Declined!",
+					"content": "<p>{user} has requested to summon <b>{amount} {actorName}</b>.</p><p>A template has been created showing the location of the summon. If you accept, the summon will be placed on the template. You can move the template before accepting.</p><p>Declining the request or Closing this window will delete the template and nothing will be spawned.</p>"
+				}
+			}
+		},
+		"settings": {
+			"killAnimationsOnKillNotify": {
+				"name": "Notify about Removing Animations on Defeated Tokens",
+				"hint": "Notify about removing animations on tokens marked as defeated in Initiative."
+			},
+			"killAnimationsOnKill": {
+				"name": "Remove Animations on Defeated Tokens",
+				"hint": "Automatically remove animations on tokens marked as defeated in Initiative."
+			},
+			"onlyImageSummons": {
+				"name": "Only Allow Summons that have an Image",
+				"hint": "Only allow for summoning of creatures that have an image."
+			},
+			"allowUncommonSummons": {
+				"name": "Allow Non-Common Summons",
+				"hint": "Allow for summoning of Uncommon, Rare, or Unique creatures by the players. You can also allow this for individual spells by adding \"uncommon\" to the spells arguments in either Autorecognition Menu or the spell itself on a character sheet."
+			},
+			"disableHitAnims": {
+				"name": "Disable \"On Hit or Miss\" Animations",
+				"hint": "While you can remove these animations from AA's Autorecognition Menu, it will likely come back when you update it. Enable this to disable these animations."
+			},
+			"randomHitAnims": {
+				"name": "Make \"On Hit or Miss\" miss animations appear Off-Target",
+				"hint": "Make miss and critical miss animations appear at a random spot near the missed target token."
+			},
+			"autoAccept": {
+				"name": "Automatically accept Effects",
+				"hint": "Automatically accept Effects from macros, such as adding the Rage Effect when you use the Rage action."
+			},
+			"autoUpdate": {
+				"name": "Open Update Menu on Module Update",
+				"hint": "Automatically open the Autorecognition Update Menu when the module is updated."
+			},
+			"smallTokenScale": {
+				"name": "Default Scale for Small Tokens",
+				"hint": "Determines what scale the animations assume Small characters are. If you use the \"Scale tokens according to size\" Pathfinder 2e system setting, this setting is disabled and assumed to be 0.8."
+			},
+			"debug": {
+				"name": "Debug Mode",
+				"hint": "Enables console logs of what PF2e Animations module is doing."
+			},
+			"tmfx": {
+				"name": "Use Token Magic Effects",
+				"hint": "A few animations benefit from being animated by Token Magic FX rather than Sequencer. Note that this setting is only shown when the Token Magic FX module is installed."
+			},
+			"autorecUpdate": {
+				"name": "Animations Update",
+				"label": "Update Menu"
+			}
+		},
+		"welcomeMessage": {
+			"header": "Welcome to PF2e Animations!",
+			"description": "This module provides animation presets for the PF2e system. These animations can slow down your machine, whether it be due to having a lower-end computer or there being a lot of effects on screen, which is common in higher level play.<p/>If you don't want to see these animations, please see the <b>Sequencer</b> module settings and disable the <b>\"Enable Effects\"</b> setting.",
+			"footer": "You can safely delete this message, you will not be sent another one.",
+			"settingsButton": "Open Settings"
+		}
+	}
+}

@@ -1,0 +1,210 @@
+{
+    "id": "pf2e-jb2a-macros",
+    "title": "PF2e Animation Macros",
+    "description": "<p>A module dedicated to making PF2e shine.</p>",
+    "version": "TO BE REPLACED",
+    "authors": [
+        {
+            "name": "MrVauxs",
+            "discord": "vauxs",
+            "twitter": "@ThatVauxs",
+            "patreon": "mrvauxs",
+            "ko-fi": "mrvauxs",
+            "flags": {}
+        }
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "languages/en.json"
+        },
+        {
+            "lang": "pl",
+            "name": "polski",
+            "path": "languages/pl.json"
+        },
+        {
+            "lang": "fr",
+            "name": "Français",
+            "path": "languages/fr.json"
+        },
+        {
+            "lang": "cn",
+            "name": "中文（简体）",
+            "path": "languages/cn.json"
+        },
+        {
+            "lang": "zh-tw",
+            "name": "正體中文",
+            "path": "languages/zh-tw.json"
+        },
+        {
+            "lang": "de",
+            "name": "Deutsch",
+            "path": "languages/de.json"
+        },
+        {
+            "lang": "it",
+            "name": "Italiano",
+            "path": "languages/it.json"
+        }
+    ],
+    "url": "https://github.com/MrVauxs/pf2e-jb2a-macros",
+    "compatibility": {
+        "minimum": "11",
+        "verified": "14"
+    },
+    "esmodules": [
+        "module/settings.js",
+        "module/pf2e-animations.js",
+        "module/sequencer-extensions.js",
+        "module/updateMenu.js",
+        "module/blacklistMenu.js",
+        "module/modifiers-matter.js"
+    ],
+    "scripts": [],
+    "styles": [
+        "styles/pf2e-animation-macros.css"
+    ],
+    "packFolders": [
+        {
+            "name": "PF2e Animations",
+            "sorting": "a",
+            "color": "#6f1c17",
+            "packs": [
+                "Macros",
+                "pf2e-actors",
+                "pf2e-actions",
+                "sf2e-Actors",
+                "sf2e-Actions"
+            ]
+        }
+    ],
+    "packs": [
+        {
+            "label": "PF2e Animation Macros",
+            "name": "Macros",
+            "path": "packs/macros",
+            "type": "Macro",
+            "private": false,
+            "flags": {}
+        },
+        {
+            "label": "PF2e Animation Actors",
+            "name": "pf2e-actors",
+            "path": "packs/actors",
+            "system": "pf2e",
+            "type": "Actor",
+            "private": false,
+            "flags": {}
+        },
+        {
+            "label": "PF2e Animation Items",
+            "name": "pf2e-actions",
+            "path": "packs/actions",
+            "system": "pf2e",
+            "type": "Item",
+            "private": false,
+            "flags": {}
+        },
+        {
+            "label": "SF2e Animation Actors",
+            "name": "sf2e-actors",
+            "path": "packs/sf2e-actors",
+            "system": "sf2e",
+            "type": "Actor",
+            "private": false,
+            "flags": {}
+        },
+        {
+            "label": "SF2e Animation Items",
+            "name": "sf2e-actions",
+            "path": "packs/sf2e-actions",
+            "system": "sf2e",
+            "type": "Item",
+            "private": false,
+            "flags": {}
+        }
+    ],
+    "relationships": {
+        "recommended": [
+            {
+                "id": "foundry-summons",
+                "type": "module",
+                "manifest": "https://github.com/MrVauxs/foundry-summons/releases/latest/download/module.json",
+                "compatibility": {
+                    "minimum": "1.5.0"
+                }
+            }
+        ],
+        "systems": [
+            {
+                "id": "pf2e",
+                "type": "system",
+                "compatibility": {
+                    "minimum": "5.0.1"
+                }
+            },
+            {
+                "id": "sf2e",
+                "type": "system",
+                "compatibility": {
+                    "minimum": "0.0.1"
+                }
+            }
+        ],
+        "requires": [
+            {
+                "id": "sequencer",
+                "type": "module",
+                "manifest": "https://github.com/fantasycalendar/FoundryVTT-Sequencer/releases/latest/download/module.json",
+                "compatibility": {
+                    "minimum": "3.6.10"
+                }
+            },
+            {
+                "manifest": "https://github.com/theripper93/autoanimations/releases/latest/download/module.json",
+                "id": "autoanimations",
+                "type": "module",
+                "compatibility": {
+                    "minimum": "4.2.60"
+                }
+            }
+        ]
+    },
+    "media": [
+        {
+            "type": "icon",
+            "url": "https://github.com/MrVauxs/pf2e-jb2a-macros/blob/main/logo.png?raw=true"
+        },
+        {
+            "type": "setup",
+            "url": "modules/pf2e-jb2a-macros/cover.png"
+        },
+        {
+            "type": "cover",
+            "url": "https://github.com/MrVauxs/pf2e-jb2a-macros/blob/main/cover.png?raw=true"
+        },
+        {
+            "type": "screenshot",
+            "url": "https://github.com/MrVauxs/pf2e-jb2a-macros/blob/main/preview.gif?raw=true",
+            "caption": "Preview of PF2e Animations module."
+        }
+    ],
+    "flags": {
+        "hotReload": {
+            "extensions": [
+                "css",
+                "hbs"
+            ],
+            "paths": [
+                "templates",
+                "styles"
+            ]
+        }
+    },
+    "changelog": "https://github.com/MrVauxs/pf2e-jb2a-macros/blob/main/CHANGELOG.md",
+    "manifest": "https://github.com/MrVauxs/pf2e-jb2a-macros/releases/latest/download/module.json",
+    "download": "https://github.com/MrVauxs/pf2e-jb2a-macros/releases/latest/download/module.zip"
+}

@@ -1,0 +1,11 @@
+.idea/*
+node_modules/*
+.vite-cache/*
+module.js
+module.js.map
+style.css
+!./src/module.js
+.DS_Store
+/dist
+/tools
+*.typescript-build

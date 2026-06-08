@@ -1,0 +1,149 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - v1-alpha
+  pull_request:
+    branches:
+      - main
+      - v1-alpha
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Vite build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get changed source files
+        id: changed-source-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            src/**
+            schema/**
+            scripts/**
+            *.ts
+            *.js
+            *.json
+            test.yml
+
+      - name: Install Bun
+        if: steps.changed-source-files.outputs.any_changed == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        if: steps.changed-source-files.outputs.any_changed == 'true'
+        run: bun install
+
+      - name: Vite build
+        if: steps.changed-source-files.outputs.any_changed == 'true'
+        id: build
+        run: bun run build:vite
+
+      - name: File Existence
+        if: steps.changed-source-files.outputs.any_changed == 'true'
+        id: files
+        uses: andstor/file-existence-action@v3.0.0
+        with:
+          files: 'module.json, dist/pf2e-graphics.js'
+          fail: true
+
+      - name: Vite build (DEBUG)
+        if: failure() && steps.build.outcome == 'success'
+        run: bun run build:vite -- --debug
+
+      - name: Svelte check
+        if: steps.changed-source-files.outputs.any_changed == 'true'
+        run: bun run check
+
+  eslint:
+    name: ESLint
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        run: bun install
+
+      - name: Test ESLint
+        run: bun run lint
+
+  animations:
+    name: Animation files
+
+    permissions:
+      pull-requests: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get changed animations
+        id: changed-animations
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            animations/**/*.json
+
+      - name: Install Bun
+        if: steps.changed-animations.outputs.any_changed == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        if: steps.changed-animations.outputs.any_changed == 'true'
+        run: bun install
+
+      - name: Test animation files
+        if: steps.changed-animations.outputs.any_changed == 'true'
+        # env:
+        #   MODIFIED_ANIMATIONS: ${{ steps.changed-animations.outputs.all_changed_files }}
+        run: 'bun run test:animations' # -- ${MODIFIED_ANIMATIONS}
+
+  sequencer_db:
+    name: Sequencer DB
+
+    permissions:
+      pull-requests: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get changed assets
+        id: changed-assets
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            src/assets/*Db.ts
+            assets/library/**
+
+      - name: Install Bun
+        if: steps.changed-assets.outputs.any_changed == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        if: steps.changed-assets.outputs.any_changed == 'true'
+        run: bun install
+
+      - name: Test Sequencer DB
+        if: steps.changed-assets.outputs.any_changed == 'true'
+        run: bun run test:assets
