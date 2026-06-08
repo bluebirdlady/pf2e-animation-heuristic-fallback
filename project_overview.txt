@@ -1,0 +1,1181 @@
+There was an initial version of the animation script (pf2eanimation-heuristic-fallback.js) that had a thorough vision for the project but that made some incorrect assumptions and didn't work correctly. In debugging. a programmer in interaction with an AI oversimplified the code to a functional script that lost most of the original vision (working_version_lacking_some_content.js).
+
+The project goal is to take the functional foundation of the new bare-bones script and incorporate the ideas of the earlier script while retaining rock-solid engineering and bug-free execution. In particular, we want to retain a clear, coherent compatibility with existing Foundry scripts and the way the Sequencer database describes and accesses the JB2A animation library. The relevant scripts and library access codes are stored for convenience in the resources folder of the project. That folder also contains a copy of a GitHub repository containing the details of all PF2e spells; see resources/Pathfinder-2E-Spell-DB-master/SpellDB/src/data/spells.json
+
+Our goals are to:
+
+1) Reincorporate as many of the ideas from the original script as possible without breaking functionality.
+
+2) Provide flavorful, thematically appropriate, and distinctive automated animation selection for PF2E spells, generating as distinctive and appropriate an experience for each spell as possible.
+
+3) Map from the PF2E spell library onto as wide a range of the JB2A animations as feasible.
+
+4) Avoid bugs, runtime errors, and other fragilities.
+
+5) Maintain a high-quality runtime experience that does not put undo burden on the client or the machines running the program.
+
+###
+
+///////////////////////////////////////////
+Expert discussion comparing the two scripts
+///////////////////////////////////////////
+
+After inspecting both actual files, I think there is a strong case that the "working" version is not merely bug-fixed—it appears to have had substantial functionality removed during the repair process.
+
+## Executive Summary
+
+| Capability                             | Present in `pf2eanimation-heuristic-fallback.js` | Present in `working_version_lacking_some_content.js` | Likely Lost?        |
+| -------------------------------------- | ------------------------------------------------ | ---------------------------------------------------- | ------------------- |
+| Curated spell database integration     | ✓                                                | ✗                                                    | Yes                 |
+| Template placement handling            | ✓                                                | ✗                                                    | Yes                 |
+| Persistent restraint/condition effects | ✓                                                | ✗                                                    | Yes                 |
+| Condition lifecycle cleanup            | ✓                                                | ✗                                                    | Yes                 |
+| Random animation variants              | ✓                                                | ✗                                                    | Yes                 |
+| Concurrency throttling                 | ✓                                                | ✗                                                    | Yes                 |
+| Config caching                         | ✓                                                | ✗                                                    | Yes                 |
+| Curated spell caching                  | ✓                                                | ✗                                                    | Yes                 |
+| Extended spell classification system   | ✓                                                | Reduced                                              | Probably            |
+| Explicit asset verification system     | ✗                                                | ✓                                                    | Added during repair |
+| Simplified routing architecture        | ✗                                                | ✓                                                    | Added during repair |
+
+My overall assessment is:
+
+> The smaller script appears to have been stabilized by replacing a complex multi-system architecture with a narrower, more deterministic routing engine.
+
+That is exactly the sort of outcome that can occur when an AI assistant repeatedly fixes runtime problems by simplifying code paths.
+
+---
+
+# Feature Group 1: Curated Spell Support
+
+The larger file contains:
+
+```js
+getCuratedSpellSet()
+```
+
+and maintains:
+
+```js
+CURATED_SPELL_SET
+```
+
+This suggests the engine can recognize spells from an existing PF2e-JB2A spell catalog rather than relying entirely on heuristics.
+
+### What was lost
+
+Without this layer:
+
+* known spells cannot receive curated mappings
+* all routing becomes heuristic
+* special-case spell handling disappears
+* quality of spell recognition may decrease
+
+### Severity
+
+**High**
+
+This is likely one of the most valuable removed systems.
+
+---
+
+# Feature Group 2: Template Placement Handling
+
+The larger file contains:
+
+```js
+listenForTemplatePlacement()
+```
+
+and:
+
+```js
+Hooks.once("createMeasuredTemplate")
+```
+
+### What this does
+
+Many PF2e spells require:
+
+* cones
+* bursts
+* emanations
+* lines
+
+The engine waits for the user to place the template before animating.
+
+### What was lost
+
+The working version has no measured-template hook at all.
+
+Potential consequences:
+
+* area spells may not animate correctly
+* animations may trigger before template placement
+* placement-dependent effects disappear
+
+### Severity
+
+**Very High**
+
+This is likely functionality rather than mere optimization.
+
+---
+
+# Feature Group 3: Persistent Crowd-Control Effects
+
+The large script advertises:
+
+> Persistent Crowd-Control Restraint Engine
+
+and contains item lifecycle hooks:
+
+```js
+Hooks.on("createItem")
+Hooks.on("deleteItem")
+```
+
+### What this implies
+
+When a PF2e condition is applied:
+
+* grabbed
+* restrained
+* entangled
+* immobilized
+
+the script can create persistent visuals.
+
+Examples:
+
+* chains
+* vines
+* magical bindings
+
+### What was lost
+
+The smaller script has no item hooks whatsoever.
+
+Therefore:
+
+* condition application cannot create visuals
+* condition removal cannot clean them up
+
+### Severity
+
+**Very High**
+
+This looks like genuine gameplay functionality that disappeared.
+
+---
+
+# Feature Group 4: Condition Cleanup Lifecycle
+
+The larger script explicitly advertises:
+
+> Robust PF2e Lifecycle Condition Unlink
+
+That language strongly suggests cleanup logic.
+
+### What was lost
+
+The smaller script only watches:
+
+```js
+createChatMessage
+```
+
+It does not watch condition creation/removal.
+
+Therefore it cannot react to:
+
+* status effects
+* persistent conditions
+* cleanup events
+
+### Severity
+
+**High**
+
+Likely a real feature loss.
+
+---
+
+# Feature Group 5: Random Animation Variants
+
+The larger script registers:
+
+```js
+randomVariants
+```
+
+and contains:
+
+```js
+maybeRandomize()
+```
+
+### What was lost
+
+Animation variation.
+
+Instead of:
+
+* Fireball A
+* Fireball B
+* Fireball C
+
+you likely get:
+
+* Fireball A every time
+
+### Severity
+
+**Low–Medium**
+
+Cosmetic rather than functional.
+
+---
+
+# Feature Group 6: Concurrency Protection
+
+The larger script includes:
+
+```js
+let activeSequences = 0;
+const MAX_CONCURRENT = 4;
+```
+
+### Purpose
+
+Prevents excessive simultaneous animation sequences.
+
+### What was lost
+
+The smaller script has no concurrency governor.
+
+Potential result:
+
+* more stress under heavy combat
+* more animation overlap
+* less protection from spam events
+
+### Severity
+
+**Medium**
+
+Not user-visible until large encounters.
+
+---
+
+# Feature Group 7: Configuration and Runtime Caching
+
+The larger script contains:
+
+```js
+CONFIG_CACHE
+CURATED_SPELL_SET
+```
+
+### Purpose
+
+Avoid repeated lookups.
+
+### What was lost
+
+The working version appears to recompute more information on demand.
+
+### Severity
+
+**Low–Medium**
+
+Mostly performance.
+
+---
+
+# Feature Group 8: Rich Classification Dictionary
+
+The larger script uses:
+
+```js
+JB2A_DICT
+```
+
+with categories such as:
+
+* elements
+* traditions
+* schools
+* restraints
+* defaults
+
+The smaller script uses:
+
+```js
+KEYWORD_MAP
+EXPLICIT_DATABASE_MAP
+```
+
+### Important observation
+
+This is not a simple upgrade/downgrade.
+
+The two systems are philosophically different.
+
+#### Large version
+
+Classification-driven:
+
+* identify spell properties
+* infer best animation
+
+#### Small version
+
+Routing-driven:
+
+* match keyword
+* resolve verified path
+* play animation
+
+### What may have been lost
+
+More nuanced distinctions:
+
+* spell traditions
+* spell schools
+* restraint categories
+* richer inference
+
+### Severity
+
+**Medium–High**
+
+Depends on how heavily those categories were actually used.
+
+---
+
+# What Appears To Have Been Added During Repair
+
+Not everything in the smaller file is a regression.
+
+The smaller script introduces a strong asset verification layer:
+
+```js
+resolveVerifiedAssetPath()
+```
+
+and:
+
+```js
+EXPLICIT_DATABASE_MAP
+```
+
+This is exactly the sort of thing someone adds when trying to eliminate runtime failures caused by missing JB2A paths.
+
+So the repair effort seems to have traded:
+
+### Before
+
+Complex feature set
+
+* templates
+* conditions
+* curated spells
+* restraint engine
+* randomization
+
+for
+
+### After
+
+Safer routing
+
+* explicit asset verification
+* fewer moving parts
+* simpler execution path
+* fewer hooks
+
+---
+
+# My Best Reconstruction of What Happened
+
+Based solely on the code:
+
+1. A feature-rich animation engine existed (`pf2eanimation-heuristic-fallback.js`).
+2. It contained multiple interacting subsystems.
+3. Some of those systems produced bugs or edge cases.
+4. During debugging, portions of the architecture were replaced with deterministic routing.
+5. The resulting script became substantially smaller.
+6. The resulting script likely works more reliably.
+7. However, several major gameplay-oriented features disappeared entirely.
+
+The most important losses appear to be:
+
+1. **Template placement handling**
+2. **Condition/restraint visual effects**
+3. **Curated spell integration**
+4. **Condition cleanup lifecycle management**
+
+Those four areas look less like refactoring and more like genuine feature removal.
+
+I think there probably *is* a path to getting them back, and the situation is actually more encouraging than it might feel at first.
+
+What I see is not a case where the feature-rich version and the working version are fundamentally incompatible. What I see is a case where the repair process appears to have **replaced entire subsystems** rather than **isolating the bugs inside those subsystems**.
+
+Those are very different situations.
+
+If the larger script were failing because its overall architecture was unsound, I'd be pessimistic. But what you've described sounds more like:
+
+> "We got it working by cutting away complicated pieces."
+
+That's often the fastest route to a stable result, but it isn't the only route.
+
+## The encouraging sign
+
+The working version did not replace everything.
+
+The core loop still seems to revolve around:
+
+* observing PF2e events
+* parsing spell information
+* resolving JB2A assets
+* executing Sequencer animations
+
+In other words, the foundation survived.
+
+The things that disappeared are mostly *adjacent systems*:
+
+* template handling
+* condition handling
+* curated mappings
+* randomization
+* caching
+* concurrency protection
+
+Those can often be reintroduced incrementally.
+
+---
+
+## I would not try to "restore everything"
+
+This is where many rescue efforts fail.
+
+If someone simply pasted all the missing code from the feature-rich version into the working version, there's a good chance you'd recreate the original bugs immediately.
+
+Instead I'd treat the working version as the stable base and reintroduce features one at a time.
+
+---
+
+## Priority 1: Curated Spell Support
+
+This would be my first restoration target.
+
+Why?
+
+Because it gives the biggest improvement in animation quality while touching relatively little runtime behavior.
+
+Conceptually:
+
+```text
+Chat Message
+    ↓
+Spell Detected
+    ↓
+Curated Lookup?
+    ↓
+YES → use curated animation
+NO  → use heuristic animation
+```
+
+That is fairly self-contained.
+
+It doesn't require:
+
+* extra hooks
+* persistent effects
+* template listeners
+
+So the risk is comparatively low.
+
+This is the feature I'd want back first.
+
+---
+
+## Priority 2: Template Placement Handling
+
+This is probably the most important gameplay feature.
+
+Without it:
+
+* bursts
+* cones
+* lines
+* emanations
+
+can never be truly correct.
+
+But it should be restored *after* curated spell support because it introduces asynchronous behavior.
+
+As soon as you add:
+
+```js
+Hooks.once("createMeasuredTemplate")
+```
+
+you introduce timing concerns.
+
+Those timing concerns are exactly the sort of thing that can generate bugs.
+
+Still, I'd consider this the second-most valuable restoration.
+
+---
+
+## Priority 3: Concurrency Controls
+
+This is actually a defensive feature.
+
+The feature-rich version appears to have had:
+
+```js
+activeSequences
+MAX_CONCURRENT
+```
+
+which is a safety mechanism.
+
+Ironically, restoring it might make the system *more* stable than the current version.
+
+This would be a relatively safe addition.
+
+---
+
+## Priority 4: Caching
+
+Another low-risk restoration.
+
+Things like:
+
+```js
+CONFIG_CACHE
+CURATED_SPELL_SET
+```
+
+don't change gameplay behavior.
+
+They just avoid repeated work.
+
+These are usually easy to bring back after the functional features are restored.
+
+---
+
+## Priority 5: Random Variants
+
+This is almost pure quality-of-life.
+
+I'd restore it late because it adds complexity but not capability.
+
+The script can work perfectly well without it.
+
+---
+
+## Priority 6: Condition / Restraint Engine
+
+This is the one I'd approach most carefully.
+
+It's also the one that most excites me conceptually because it's the most unique feature.
+
+The problem is that:
+
+```js
+Hooks.on("createItem")
+Hooks.on("deleteItem")
+```
+
+touch live actor state.
+
+That means:
+
+* cleanup bugs
+* orphaned effects
+* duplicate effects
+* race conditions
+
+are all possible.
+
+If Gemini was struggling with anything, this is one of the areas I'd suspect first.
+
+Not because it's bad design, but because it's a more complicated design.
+
+---
+
+## What I suspect actually happened
+
+If I had to guess, I don't think the missing features were removed because they were unimportant.
+
+I think they were removed because they were expensive to debug.
+
+An AI trying to fix a runtime issue often gravitates toward:
+
+```text
+Feature exists
+    ↓
+Feature causes error
+    ↓
+Remove feature
+    ↓
+Error disappears
+```
+
+rather than:
+
+```text
+Feature exists
+    ↓
+Feature causes error
+    ↓
+Understand interaction
+    ↓
+Fix interaction
+```
+
+The second path requires much more context retention.
+
+That's exactly where long debugging sessions can go wrong.
+
+---
+
+My recommendation would be to treat the current working file as a **stable trunk** and the larger file as a **feature donor**.
+
+Not "restore the old file."
+
+Not "merge the files."
+
+Instead:
+
+1. Keep the working file.
+2. Inventory every missing subsystem.
+3. Reintroduce them individually.
+4. Test after each restoration.
+
+If I were doing the project, the restoration order would be:
+
+1. Curated spell support
+2. Template placement handling
+3. Concurrency controls
+4. Caching
+5. Random variants
+6. Condition/restraint engine
+
+That order maximizes recovered capability while minimizing the chance of reintroducing the original instability.
+
+
+Actually, yes. The more I think about it, the rich classification dictionary may be one of the most important losses—not because it's flashy, but because it affects *everything else*.
+
+My earlier prioritization was driven by "what can be restored safely and independently?" rather than "what is most architecturally valuable?"
+
+Those are different questions.
+
+## Why I initially deprioritized it
+
+The classification system is foundational. That means it touches:
+
+* spell parsing
+* animation selection
+* traditions
+* schools
+* damage types
+* restraints
+* special-case logic
+
+Restoring it is not a self-contained feature like random variants or caching. It potentially changes the behavior of every spell.
+
+That's exactly why I'd be cautious about restoring it.
+
+But that doesn't mean it's unimportant.
+
+---
+
+## In fact, it may explain why the larger script existed at all
+
+Looking at the two designs conceptually:
+
+### Working version
+
+```text
+Spell Text
+    ↓
+Keyword Match
+    ↓
+Asset Path
+    ↓
+Animation
+```
+
+### Feature-rich version
+
+```text
+Spell Text
+    ↓
+Classification
+    ├─ Damage Type
+    ├─ Tradition
+    ├─ School
+    ├─ Restraint
+    ├─ Teleportation
+    └─ Special Traits
+    ↓
+Animation Selection
+    ↓
+Animation
+```
+
+Those are fundamentally different philosophies.
+
+The first says:
+
+> "Find a keyword and play something appropriate."
+
+The second says:
+
+> "Understand what kind of spell this is and build an animation from that understanding."
+
+That's a much more ambitious system.
+
+---
+
+## The hidden value
+
+Suppose a spell description contains:
+
+```text
+spirit damage
+occult
+mental assault
+```
+
+A keyword system may only notice:
+
+```text
+damage
+```
+
+or perhaps:
+
+```text
+mental
+```
+
+and route to a generic effect.
+
+A classification system can infer:
+
+```text
+damageType = spirit
+tradition = occult
+school = mental/enchantment
+```
+
+and combine those dimensions.
+
+That's qualitatively different behavior.
+
+---
+
+## It may also be a prerequisite for the other features
+
+This is the part that makes me think differently about it.
+
+Several of the "lost" systems may have depended on classification.
+
+For example:
+
+### Restraint Engine
+
+If the code can classify:
+
+```text
+entangled
+grabbed
+restrained
+```
+
+then it knows whether to play:
+
+* vines
+* chains
+* magical bindings
+
+Without classification, that system becomes much harder.
+
+### Curated Spell Support
+
+Curated mappings and classification often work together.
+
+A curated entry fails?
+
+Fallback to classification.
+
+Classification fails?
+
+Fallback to keyword matching.
+
+That's a layered architecture.
+
+### Template Placement
+
+Classification may determine:
+
+```text
+burst
+cone
+line
+emanation
+```
+
+which in turn determines how templates are handled.
+
+---
+
+## What I would now call the most important losses
+
+After thinking about the architecture rather than the individual features, I would probably reorder the losses like this:
+
+### Tier 1: Core Intelligence
+
+1. Rich classification dictionary
+2. Curated spell support
+
+These determine how well the engine understands spells.
+
+---
+
+### Tier 2: Gameplay Features
+
+3. Template placement handling
+4. Condition/restraint engine
+
+These determine what the engine can do.
+
+---
+
+### Tier 3: Robustness Features
+
+5. Concurrency controls
+6. Caching
+7. Condition cleanup lifecycle
+
+These determine how reliably it operates.
+
+---
+
+### Tier 4: Cosmetic Features
+
+8. Random variants
+
+Nice, but not transformative.
+
+---
+
+## One thing I'd want to verify
+
+The crucial question is whether the working version truly *lost* classification, or whether classification was merely flattened into a less elegant form.
+
+If the repair process replaced:
+
+```js
+JB2A_DICT.elements
+JB2A_DICT.traditions
+JB2A_DICT.schools
+JB2A_DICT.restraints
+```
+
+with a large keyword-routing table, then some of the intelligence may still be there, just encoded differently.
+
+In that case, the classification system is not gone—it's been compressed into a harder-to-maintain form.
+
+If, however, those dimensions genuinely disappeared and the parser now only looks for a handful of elemental keywords, then I would consider the rich classification dictionary one of the most significant architectural losses in the entire comparison.
+
+So yes: on reflection, I am very interested in it. It may be less visible than template handling or restraint effects, but it looks like the piece that gave the original design its sophistication.
+
+
+Yes. Seeing the actual map changes my assessment quite a bit.
+
+That isn't a "compressed classification system."
+
+That's a **radically simplified replacement**.
+
+The original architecture I inferred might have survived in disguised form. But what you've posted is essentially:
+
+```js
+keyword -> color + trait
+```
+
+plus:
+
+```js
+animation role -> fallback asset list
+```
+
+That's it.
+
+There are only about a dozen conceptual categories:
+
+* fire
+* acid
+* cold
+* electricity
+* sonic
+* force
+* healing
+* holy/good
+* negative/void
+* poison
+
+Everything else gets funneled through those.
+
+---
+
+## What the original system was probably trying to do
+
+A rich classification engine would typically separate dimensions like:
+
+```text
+Damage Type
+School
+Tradition
+Delivery Method
+Area Shape
+Condition Type
+Spell Theme
+Targeting Mode
+```
+
+For PF2e that might mean recognizing distinctions such as:
+
+### Traditions
+
+```text
+Arcane
+Divine
+Occult
+Primal
+```
+
+### Schools
+
+```text
+Abjuration
+Conjuration
+Divination
+Enchantment
+Evocation
+Illusion
+Necromancy
+Transmutation
+```
+
+### Damage
+
+```text
+Fire
+Cold
+Acid
+Electricity
+Poison
+Mental
+Spirit
+Vitality
+Void
+Force
+Sonic
+Bleed
+```
+
+### Conditions
+
+```text
+Grabbed
+Restrained
+Immobilized
+Paralyzed
+Frightened
+Confused
+Slowed
+```
+
+### Spell Behaviors
+
+```text
+Teleport
+Summon
+Wall
+Aura
+Healing
+Buff
+Debuff
+```
+
+Your posted map contains almost none of that.
+
+---
+
+## What this means in practice
+
+Suppose a spell description contains:
+
+```text
+The target is overwhelmed by horrifying visions.
+```
+
+The original system might infer:
+
+```text
+tradition = occult
+school = illusion
+effect = mental
+debuff = fear
+```
+
+The new map sees:
+
+```text
+(no keyword match)
+```
+
+or maybe falls back to a generic effect.
+
+---
+
+Suppose the spell is:
+
+```text
+Dimension Door
+```
+
+The original system might infer:
+
+```text
+teleportation
+```
+
+and play a teleport effect.
+
+The new system:
+
+```text
+no fire
+no acid
+no cold
+no poison
+```
+
+so it has no meaningful classification.
+
+---
+
+Suppose the spell is:
+
+```text
+Black Tentacles
+```
+
+The original system might infer:
+
+```text
+restraint
+conjuration
+persistent battlefield effect
+```
+
+The new system has no vocabulary for that at all.
+
+---
+
+## The EXPLICIT_DATABASE_MAP is telling
+
+What really stands out to me is this part:
+
+```js
+castRing
+groundRing
+impact
+projectile
+tokenBuff
+```
+
+Those are not spell concepts.
+
+Those are animation slots.
+
+The architecture has shifted from:
+
+```text
+What kind of spell is this?
+```
+
+to:
+
+```text
+Which color should we plug into a generic animation pipeline?
+```
+
+That's a completely different level of abstraction.
+
+---
+
+## My revised opinion
+
+Earlier I ranked the losses as:
+
+1. Curated spell support
+2. Template handling
+3. etc.
+
+After seeing this map, I would move the classification system much higher.
+
+I now think there are really two different projects represented by these files.
+
+### Original vision
+
+```text
+PF2e spell understanding engine
+        ↓
+animation selection
+```
+
+### Revised version
+
+```text
+keyword matcher
+        ↓
+color picker
+        ↓
+generic animation selection
+```
+
+That's not meant as criticism of the repaired version. In fact, it's easy to see why it would be more reliable.
+
+But from a design perspective, a tremendous amount of semantic richness appears to have disappeared.
+
+---
+
+In fact, if I were planning a restoration project now, I would probably change my roadmap.
+
+Instead of:
+
+1. Curated spells
+2. Templates
+3. Concurrency
+4. Caching
+5. Variants
+6. Conditions
+
+I would probably start with:
+
+1. Restore the classification model
+2. Restore curated spell mappings
+3. Restore template handling
+4. Restore restraint/condition handling
+5. Restore robustness features
+
+Because the classification model looks like the intellectual center of the original design. Many of the other missing systems likely become easier and more valuable once the script can again reason about spells as more than "fire = orange" and "cold = blue."

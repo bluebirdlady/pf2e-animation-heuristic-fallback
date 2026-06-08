@@ -1,0 +1,723 @@
+﻿@import "../../node_modules/bootstrap-css-only/css/bootstrap.min";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/all";
+
+
+$pathfinderRed: #5e0000;
+$pathfinderGold: #dcb07b;
+
+$tr: #eee4c8;
+$tr-alt: #f5efe0;
+
+$darkGreen: #3e4f54;
+$title: #000000;
+$traitForeground: #FFF;
+$traitBackground: $pathfinderRed;
+$powerRed: #8b1c1b;
+$uncommonRarity: #c45500;
+$rareRarity: #0c1466;
+$uniqueRarity: #54166e;
+$alignmentTrait: #4287f5;
+
+$slider-bg: #ccc;
+$slider-active: #2196F3;
+$slider-ball: #FFF;
+
+$light-bg: #fff;
+$light-text: #212529;
+$dark-bg: #1A1A1A;
+$dark-text: #EEE;
+
+$unprepareIcon: #dc3545;
+$prepareIcon: #28a745;
+
+#app > .light, #app > .dark {
+    min-height: 100vh;
+}
+
+.light {
+    background-color: $light-bg;
+    color: $light-text;
+}
+.dark {
+    background: $dark-bg;
+    color: $dark-text;
+    .table {
+        color: $dark-text;
+    }
+    .card-header {
+        background-color: #444;
+    }
+
+    .card-body {
+        background-color: #222;
+    }
+
+    .list-group-item-info, .alert-info {
+        background-color: #3498DB;
+        color: $dark-text;
+    }
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+    vertical-align: middle;
+
+    input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $slider-bg;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 17px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 2px;
+        background-color: $slider-ball;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: $slider-active;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px $slider-active;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+    }
+}
+.nav-item {
+    .nav-link {
+        cursor: pointer;
+
+        .switch {
+            margin-right: 8px;
+        }
+    }
+}
+a { cursor: pointer; }
+.selectedSpell .spellDetail {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+}
+.vancian {
+    display: inline-block;
+    span.item {
+        padding: 0 4px;
+    }
+    .action {
+        display: none;
+        display: inline-block;
+
+        i {
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        i.fa-minus-square {
+            color: $unprepareIcon;
+        }
+
+        i.fa-plus-square {
+            color: $prepareIcon;
+        }
+    }
+
+    .fa-ban {
+        color: $unprepareIcon;
+    }
+
+    .fa-magic {
+        color: $prepareIcon;
+    }
+}
+.bookmarkListSummary {
+    .card-header {
+        padding: 3px 10px;
+
+        .listName {
+            font-size: 20px;
+        }
+
+        .modeToggle {
+            display: inline-flex;
+            flex-direction: row;
+            float: right;
+            border: 3px solid #DDD;
+            border-radius: 10px;
+            background: #EEE;
+
+            .dark & {
+                border-color: #555;
+                background: #666;
+                color: #000;
+            }
+
+            .mode {
+                flex-grow: 1;
+                padding: 3px;
+                border-radius: 7px;
+                background-clip: border-box;
+
+                &.active {
+                    background: $prepareIcon;
+                }
+            }
+        }
+    }
+
+    .card-body {
+        ul.spells {
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+
+            > li {
+                list-style: none;
+                display: flex;
+                flex-direction: row;
+                border-bottom: 1px solid #666;
+
+                a.spellName {
+                    flex-grow: 1;
+                }
+
+                span.vancian {
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .spellLevel {
+            color: $title;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid $title;
+            padding-bottom: 2px;
+            margin-right: 1ex;
+
+            .dark & {
+                color: $dark-text;
+                border-color: #FFF;
+            }
+        }
+    }
+}
+
+.spellDetail {
+    > div, > ul {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .title {
+        color: $title;
+        border-bottom: 1px solid $title;
+        padding-bottom: 2px;
+        display: flex;
+        align-items: flex-start;
+
+        .spellName {
+            font-weight: bold;
+            text-transform: uppercase;
+            flex-grow: 1;
+        }
+
+        .dark & {
+            color: $dark-text;
+            border-color: #FFF;
+        }
+
+        .spellClass {
+            display: block;
+            float: right;
+
+            .bookmark {
+                display: inline-block;
+                padding: 0 10px 0 0;
+
+                &.active {
+                    color: purple;
+
+                    .dark & {
+                        color: #b300b2
+                    }
+                }
+            }
+        }
+    }
+
+    .traits {
+        display: block;
+
+        li {
+            display: inline-block;
+            color: $traitForeground;
+            background-color: $traitBackground;
+            border-top: 2px solid $pathfinderGold;
+            border-bottom: 2px solid $pathfinderGold;
+            border-left: 3px solid $pathfinderGold;
+            list-style: none;
+            text-align: center;
+            padding: 3px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            &:last-child {
+                border-right: 3px solid $pathfinderGold;
+            }
+
+            &.uncommon {
+                background-color: $uncommonRarity;
+            }
+
+            &.rare {
+                background-color: $rareRarity;
+            }
+
+            &.unique {
+                background-color: $uniqueRarity;
+            }
+
+            &.alignment {
+                background-color: $alignmentTrait;
+            }
+        }
+    }
+
+    .header {
+
+        .castingToken, .headerElement {
+            &::after {
+                content: ", ";
+            }
+
+            &:last-child::after {
+                content: "";
+            }
+        }
+
+        span.actions-1, span.actions-2, span.actions-3 {
+            font-weight: bold;
+        }
+
+        .headerElement {
+            &::after {
+                content: "; ";
+            }
+
+            &:last-child::after {
+                content: "";
+            }
+        }
+    }
+
+    .body {
+        > div {
+            margin-top: 2px;
+            margin-bottom: 2px;
+
+            &.save {
+                padding-left: 10px;
+
+                strong::after {
+                    content: " "
+                }
+            }
+
+            &.option {
+                display: list-item;
+                list-style: circle inside none;
+            }
+        }
+
+        hr {
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+    }
+    .mainText {
+        p {
+        }
+    }
+    .footerNote {
+        font-style: italic;
+    }
+
+    .body, .altPrep {
+        table {
+            thead tr {
+                background: $pathfinderRed;
+                color: #FFF;
+            }
+
+            tbody tr {
+                background: $tr;
+                color: #000;
+
+                &:nth-child(2n) {
+                    background: $tr-alt;
+                }
+            }
+
+            th {
+                font-weight: normal;
+
+                &.title {
+                    text-align: center;
+                    font-weight: bold;
+                }
+            }
+
+            th, td {
+                padding: 3px 12px;
+
+                &.number {
+                    text-align: center;
+                }
+            }
+
+            td.split {
+                border-left: 4px solid $pathfinderRed;
+            }
+        }
+    }
+
+    .altPrep {
+        .altActions > i {
+            padding: 0 10px 0 0;
+
+            &:last-child {
+                padding: 0;
+            }
+        }
+    }
+}
+
+img.actions {
+    height: 1em;
+}
+
+@media (max-width: 575px) {
+    .spellListList {
+        max-height: 150px;
+        overflow-y: scroll;
+    }
+}
+
+.spell-list-item {
+    text-transform: capitalize;
+
+    .level {
+        float: right;
+        display: inline-block;
+        color: white;
+        padding: 0 3px;
+        border-top-left-radius: 10px;
+        margin-left: 3px;
+        background: black;
+
+        &.rarity-1 {
+            background: $uncommonRarity;
+        }
+
+        &.rarity-2 {
+            background: $rareRarity;
+        }
+
+        &.rarity-3 {
+            background: $uniqueRarity;
+        }
+    }
+
+    .powerTypes span {
+        text-transform: capitalize;
+
+        &:after {
+            content: ", "
+        }
+
+        &:last-child:after {
+            content: ""
+        }
+    }
+}
+
+.spell-search {
+    select, select option {
+        text-transform: capitalize;
+    }
+
+    .criteria, .sort {
+        label {
+            min-width: 90px;
+        }
+
+        .form-row {
+            padding-bottom: 10px;
+        }
+    }
+
+    .levels {
+        .level-row {
+            display: flex;
+            width: 100%;
+
+            .level-col {
+                flex-basis: 0;
+                flex-grow: 1;
+                max-width: 100%;
+                padding: 3px;
+                text-align: center;
+
+                input[type=checkbox] {
+                    display: none;
+
+                    + label {
+                        min-width: 42px;
+                        text-align: center;
+                        background-color: #fafafa;
+                        border: 1px solid #cacece;
+                        box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+                        padding: 9px;
+                        border-radius: 3px;
+                        display: inline-block;
+                        position: relative;
+
+                        .dark & {
+                            color: #FFF;
+                            background-color: #444;
+                            border-color: #444;
+                        }
+                    }
+
+                    &:checked + label {
+                        background-color: #FFFF00;
+                        box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+
+                        .dark & {
+                            background-color: #2384c6;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.quickRefContent {
+    padding: 5px;
+
+    a.back {
+        padding: 0 5px;
+        cursor: pointer;
+    }
+}
+
+.quickRefGrid {
+    display: flex;
+    flex-wrap: wrap;
+
+    .tile {
+        width: 150px;
+        height: 150px;
+        border: 1px solid #808080;
+        border-radius: 5px;
+        text-align: center;
+        padding: 25px 0;
+        margin: 10px;
+        cursor: pointer;
+
+        .dark & {
+            border-color: #C0C0C0;
+        }
+
+        &:hover {
+            background: #DDD;
+
+            .dark & {
+                background: #333;
+            }
+        }
+
+        .icon {
+            font-size: 3em;
+        }
+
+        .label {
+        }
+    }
+}
+
+.quickRefTable {
+    table.table {
+        thead tr {
+            background: $pathfinderRed;
+            color: #FFF;
+        }
+
+        tbody tr {
+            background: $tr;
+            color: #000;
+
+            &:nth-child(2n) {
+                background: $tr-alt;
+            }
+        }
+
+        th {
+            font-weight: normal;
+
+            &.title {
+                text-align: center;
+                font-weight: bold;
+            }
+        }
+
+        th, td {
+            padding: 3px 12px;
+
+            &.number {
+                text-align: center;
+            }
+        }
+
+        td.split {
+            border-left: 4px solid $pathfinderRed;
+        }
+    }
+
+    table.compact {
+        th, td {
+            padding: 3px;
+        }
+    }
+}
+
+.quickRefList {
+
+
+    .card-body {
+        padding: 0.5rem;
+
+        .card-subheading {
+            padding: 5px 0 5px 10px;
+
+            .card-subheading-title {
+                font-weight: bold;
+
+                &::after {
+                    content: ": ";
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+.spellListConfig {
+    .bookmarkListRow {
+        margin-bottom: 20px;
+        .row {
+            margin-bottom: 10px;
+        }
+        .spellListHeaderRow {
+            font-weight: bold;
+        }
+
+        .spellListDetailRow {
+            text-align: center;
+        }
+
+        .spellListDetailHeaderRow {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .actions {
+            text-align: center;
+        }
+    }
+
+    .global-actions {
+
+        button {
+            margin-left: 10px;
+        }
+    }
+}
+
+.randomNpc {
+    .npcCard {
+        margin-bottom: 20px;
+
+        .card-header {
+            text-align: center;
+            font-weight: bold;
+
+            button {
+                font-weight: normal;
+                position: absolute;
+                top: 9px;
+                right: 9px;
+            }
+        }
+    }
+
+    p {
+        margin: 5px 0;
+    }
+
+    .alignmentGrid {
+        text-align: center;
+    }
+
+    .abilityTable {
+        margin: 0;
+
+        tr:first-child {
+            th, td {
+                border-top: 0;
+            }
+        }
+
+        td {
+            text-align: right;
+        }
+    }
+}
+
+.about {
+    padding: 10px;
+
+    pre {
+        white-space: pre-wrap;
+    }
+}

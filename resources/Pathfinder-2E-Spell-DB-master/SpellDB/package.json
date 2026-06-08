@@ -1,0 +1,52 @@
+{
+  "name": "SpellDB",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
+    "bootstrap-css-only": "^4.4.1",
+    "immutability-helper": "^3.1.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-markdown": "^4.3.1",
+    "throttle-debounce": "^2.3.0"
+  },
+  "-vs-binding": {
+    "BeforeBuild": [
+      "build:js",
+      "build:css",
+      "build:manifest",
+      "build:docs"
+    ]
+  },
+  "scripts": {
+    "build:js": "node buildScripts/browserify_glob.js 'src/scripts/**/*.jsx' > www/scripts/bundle.js",
+    "build:js:dev": "node buildScripts/browserify_glob.js 'src/scripts/**/*.jsx' dev > www/scripts/bundle.js",
+    "build:manifest": "node buildScripts/offlineManifest.js",
+    "build:docs": "node buildScripts/copyDocs.js",
+    "build:css": "node node_modules/sass/sass src/css/style.scss www/css/style.css",
+    "copyDependencies": "node buildScripts/copyDependencies.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.4",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "babelify": "latest",
+    "browserify": "^16.5.2",
+    "cordova-android": "^12.0.0",
+    "envify": "latest",
+    "fs-extra": "^9.0.1",
+    "glob": "latest",
+    "nodemon": "^2.0.4",
+    "sass": "^1.63.6",
+    "tinyify": "^3.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {}
+  }
+}

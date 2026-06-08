@@ -1,0 +1,729 @@
+[
+  {
+    "name": "Traditions",
+    "matchBy": "array",
+    "match": "traditions",
+    "options": [
+      {
+        "name": "Arcane",
+        "value": "arcane"
+      },
+      {
+        "name": "Divine",
+        "value": "divine"
+      },
+      {
+        "name": "Occult",
+        "value": "occult"
+      },
+      {
+        "name": "Primal",
+        "value": "primal"
+      }
+    ]
+  },
+  {
+    "name": "Type",
+    "matchBy": "array",
+    "match": "type",
+    "options": [
+      {
+        "name": "Spell",
+        "value": "Spell"
+      },
+      {
+        "name": "Focus",
+        "value": "Focus"
+      },
+      {
+        "name": "Cantrip",
+        "value": "Cantrip"
+      }
+    ]
+  },
+  {
+    "name": "Duration",
+    "matchBy": "value",
+    "match": "duration",
+    "sort": "duration",
+    "options": null
+  },
+  {
+    "name": "Range",
+    "matchBy": "value",
+    "match": "range",
+    "sort": "range",
+    "options": [
+      {
+        "name": "Touch",
+        "value": "touch"
+      },
+      {
+        "name": "30 Feet",
+        "value": "30 feet"
+      },
+      {
+        "name": "60 Feet",
+        "value": "60 feet"
+      },
+      {
+        "name": "120 Feet",
+        "value": "120 feet"
+      }
+    ]
+  },
+  {
+    "name": "Traits",
+    "matchBy": "array",
+    "match": "traits",
+    "options": null
+  },
+  {
+    "name": "Area",
+    "matchBy": "contains",
+    "match": "area",
+    "sort": "area",
+    "allLabel": "Any",
+    "options": [
+      {
+        "name": "Burst",
+        "value": "Burst"
+      },
+      {
+        "name": "Cone",
+        "value": "Cone"
+      },
+      {
+        "name": "Emanation",
+        "value": "Emanation"
+      },
+      {
+        "name": "Line",
+        "value": "Line"
+      }
+    ]
+  },
+  {
+    "name": "Focus Powers - Domains",
+    "matchBy": "lookup",
+    "options": [
+      {
+        "name": "Abomination",
+        "value": "Abomination"
+      },
+      {
+        "name": "Air",
+        "value": "Air"
+      },
+      {
+        "name": "Ambition",
+        "value": "Ambition"
+      },
+      {
+        "name": "Change",
+        "value": "Change"
+      },
+      {
+        "name": "Cities",
+        "value": "Cities"
+      },
+      {
+        "name": "Cold",
+        "value": "Cold"
+      },
+      {
+        "name": "Confidence",
+        "value": "Confidence"
+      },
+      {
+        "name": "Creation",
+        "value": "Creation"
+      },
+      {
+        "name": "Darkness",
+        "value": "Darkness"
+      },
+      {
+        "name": "Death",
+        "value": "Death"
+      },
+      {
+        "name": "Decay",
+        "value": "Decay"
+      },
+      {
+        "name": "Delerium",
+        "value": "Delerium"
+      },
+      {
+        "name": "Destruction",
+        "value": "Destruction"
+      },
+      {
+        "name": "Dreams",
+        "value": "Dreams"
+      },
+      {
+        "name": "Dust",
+        "value": "Dust"
+      },
+      {
+        "name": "Duty",
+        "value": "Duty"
+      },
+      {
+        "name": "Earth",
+        "value": "Earth"
+      },
+      {
+        "name": "Family",
+        "value": "Family"
+      },
+      {
+        "name": "Fate",
+        "value": "Fate"
+      },
+      {
+        "name": "Fire",
+        "value": "Fire"
+      },
+      {
+        "name": "Freedom",
+        "value": "Freedom"
+      },
+      {
+        "name": "Glyph",
+        "value": "Glyph"
+      },
+      {
+        "name": "Healing",
+        "value": "Healing"
+      },
+      {
+        "name": "Indulgence",
+        "value": "Indulgence"
+      },
+      {
+        "name": "Introspection",
+        "value": "Introspection"
+      },
+      {
+        "name": "Knowledge",
+        "value": "Knowledge"
+      },
+      {
+        "name": "Lightning",
+        "value": "Lightning"
+      },
+      {
+        "name": "Luck",
+        "value": "Luck"
+      },
+      {
+        "name": "Magic",
+        "value": "Magic"
+      },
+      {
+        "name": "Metal",
+        "value": "Metal"
+      },
+      {
+        "name": "Might",
+        "value": "Might"
+      },
+      {
+        "name": "Moon",
+        "value": "Moon"
+      },
+      {
+        "name": "Naga",
+        "value": "Naga"
+      },
+      {
+        "name": "Nature",
+        "value": "Nature"
+      },
+      {
+        "name": "Nightmares",
+        "value": "Nightmares"
+      },
+      {
+        "name": "Pain",
+        "value": "Pain"
+      },
+      {
+        "name": "Passion",
+        "value": "Passion"
+      },
+      {
+        "name": "Perfection",
+        "value": "Perfection"
+      },
+      {
+        "name": "Plague",
+        "value": "Plague"
+      },
+      {
+        "name": "Protection",
+        "value": "Protection"
+      },
+      {
+        "name": "Repose",
+        "value": "Repose"
+      },
+      {
+        "name": "Secrecy",
+        "value": "Secrecy"
+      },
+      {
+        "name": "Sorrow",
+        "value": "Sorrow"
+      },
+      {
+        "name": "Soul",
+        "value": "Soul"
+      },
+      {
+        "name": "Star",
+        "value": "Star"
+      },
+      {
+        "name": "Sun",
+        "value": "Sun"
+      },
+      {
+        "name": "Swarm",
+        "value": "Swarm"
+      },
+      {
+        "name": "Time",
+        "value": "Time"
+      },
+      {
+        "name": "Toil",
+        "value": "Toil"
+      },
+      {
+        "name": "Travel",
+        "value": "Travel"
+      },
+      {
+        "name": "Trickery",
+        "value": "Trickery"
+      },
+      {
+        "name": "Truth",
+        "value": "Truth"
+      },
+      {
+        "name": "Tyranny",
+        "value": "Tyranny"
+      },
+      {
+        "name": "Undeath",
+        "value": "Undeath"
+      },
+      {
+        "name": "Vigil",
+        "value": "Vigil"
+      },
+      {
+        "name": "Void",
+        "value": "Void"
+      },
+      {
+        "name": "Water",
+        "value": "Water"
+      },
+      {
+        "name": "Wealth",
+        "value": "Wealth"
+      },
+      {
+        "name": "Wood",
+        "value": "Wood"
+      },
+      {
+        "name": "Wyrmkin",
+        "value": "Wyrmkin"
+      },
+      {
+        "name": "Zeal",
+        "value": "Zeal"
+      }
+    ],
+    "lookup": {
+      "Abomination": [ "Lift Nature's Caul", "Fearful Feast" ],
+      "Air": [ "Pushing Gust", "Disperse into Air" ],
+      "Ambition": [ "Ignite Ambition", "Competitive Edge" ],
+      "Change": [ "Adapt Self", "Adaptive Ablation" ],
+      "Cities": [ "Face in the Crowd", "Pulse of Civilization" ],
+      "Cold": [ "Winter Bolt", "Diamond Dust" ],
+      "Confidence": [ "Veil of Confidence", "Delusional Pride" ],
+      "Creation": [ "Creative Splash", "Artistic Flourish" ],
+      "Darkness": [ "Cloak of Shadow", "Darkened Sight" ],
+      "Death": [ "Death's Call", "Eradicate Undeath" ],
+      "Decay": [ "Withering Grasp", "Fallow Field" ],
+      "Delerium": [ "Hyperfocus", "Ephemeral Hazards" ],
+      "Destruction": [ "Cry of Destruction", "Destructive Aura" ],
+      "Dreams": [ "Sweet Dreams", "Dreamer's Call" ],
+      "Dust": [ "Parch", "Dust Storm" ],
+      "Duty": [ "Oathkeeper's Insignia", "Dutiful Challenge" ],
+      "Earth": [ "Hurtling Stone", "Localized Quake" ],
+      "Family": [ "Soothing Words", "Unity" ],
+      "Fate": [ "Read Fate", "Tempt Fate" ],
+      "Fire": [ "Fire Ray", "Flame Barrier" ],
+      "Freedom": [ "Unimpeded Stride", "Word of Freedom" ],
+      "Glyph": [ "Redact", "Ghostly Transcription" ],
+      "Healing": [ "Healer's Blessing", "Rebuke Death" ],
+      "Indulgence": [ "Overstuff", "Take its Course" ],
+      "Introspection": [ "Guided Introspection", "Confront Selves" ],
+      "Knowledge": [ "Scholarly Recollection", "Know the Enemy" ],
+      "Lightning": [ "Charged Javelin", "Bottle the Storm" ],
+      "Luck": [ "Bit of Luck", "Lucky Break" ],
+      "Magic": [ "Magic's Vessel", "Mystic Beacon" ],
+      "Metal": [ "Serrate", "Repel Metal" ],
+      "Might": [ "Athletic Rush", "Enduring Might" ],
+      "Moon": [ "Moonbeam", "Touch of the Moon" ],
+      "Naga": [ "Split the Tongue", "Ordained Purpose" ],
+      "Nature": [ "Vibrant Thorns", "Nature's Bounty" ],
+      "Nightmares": [ "Waking Nightmare", "Shared Nightmare" ],
+      "Pain": [ "Savor the Sting", "Retributive Pain" ],
+      "Passion": [ "Charming Touch", "Captivating Adoration" ],
+      "Perfection": [ "Perfected Mind", "Perfected Body" ],
+      "Plague": [ "Divine Plagues", "Foul Miasma" ],
+      "Protection": [ "Protector's Sacrifice", "Protector's Sphere" ],
+      "Repose": [ "Share Burden", "Font of Serenity" ],
+      "Secrecy": [ "Whispering Quiet", "Safeguard Secret" ],
+      "Sorrow": [ "Lament", "Overflowing Sorrow" ],
+      "Soul": [ "Eject Soul", "Ectoplasmic Interstice" ],
+      "Star": [ "Zenith Star", "Asterism" ],
+      "Sun": [ "Dazzling Flash", "Vital Luminance" ],
+      "Swarm": [ "Swarmsense", "Swarm Form" ],
+      "Time": [ "Delay Consequence", "Stasis" ],
+      "Toil": [ "Practice Makes Perfect", "Tireless Worker" ],
+      "Travel": [ "Agile Feet", "Traveler's Transit" ],
+      "Trickery": [ "Sudden Shift", "Trickster's Twin" ],
+      "Truth": [ "Word of Truth", "Glimpse the Truth" ],
+      "Tyranny": [ "Touch of Obedience", "Commanding Lash" ],
+      "Undeath": [ "Touch of Undeath", "Malignant Sustenance" ],
+      "Vigil": [ "Object Memory", "Remember the Lost" ],
+      "Void": [ "Empty Inside", "Door to Beyond" ],
+      "Water": [ "Tidal Surge", "Downpour" ],
+      "Wealth": [ "Appearance of Wealth", "Precious Metals" ],
+      "Wood": [ "Arms of Nature", "Wood Walk" ],
+      "Wyrmkin": [ "Draconic Barrage", "Roar of the Wyrm" ],
+      "Zeal": [ "Weapon Surge", "Zeal for Battle" ]
+    }
+  },
+  {
+    "name": "Focus Powers - Bloodlines",
+    "matchBy": "lookup",
+    "options": [
+      {
+        "name": "Aberrant",
+        "value": "Aberrant"
+      },
+      {
+        "name": "Angelic",
+        "value": "Angelic"
+      },
+      {
+        "name": "Demonic",
+        "value": "Demonic"
+      },
+      {
+        "name": "Diabolic",
+        "value": "Diabolic"
+      },
+      {
+        "name": "Draconic",
+        "value": "Draconic"
+      },
+      {
+        "name": "Elemental",
+        "value": "Elemental"
+      },
+      {
+        "name": "Fey",
+        "value": "Fey"
+      },
+      {
+
+        "name": "Genie",
+        "value": "Genie"
+      },
+      {
+        "name": "Hag",
+        "value": "Hag"
+      },
+      {
+        "name": "Harrow",
+        "value": "Harrow"
+      },
+      {
+        "name": "Imperial",
+        "value": "Imperial"
+      },
+      {
+
+        "name": "Nymph",
+        "value": "Nymph"
+      },
+      {
+        "name": "Phoenix",
+        "value": "Phoenix"
+      },
+      {
+
+        "name": "Psychopomp",
+        "value": "Psychopomp"
+      },
+      {
+
+        "name": "Shadow",
+        "value": "Shadow"
+      },
+      {
+        "name": "Undead",
+        "value": "Undead"
+      },
+      {
+        "name": "Wyrmblessed",
+        "value": "Wyrmblessed"
+      }
+    ],
+    "lookup": {
+      "Aberrant": [ "Tentacular Limbs", "Aberrant Whispers", "Unusual Anatomy" ],
+      "Angelic": [ "Angelic Halo", "Angelic Wings", "Celestial Brand" ],
+      "Demonic": [ "Glutton's Jaw", "Swamp of Sloth", "Abyssal Wrath" ],
+      "Diabolic": [ "Diabolic Edict", "Embrace the Pit", "Hellfire Plume" ],
+      "Draconic": [ "Dragon Claws", "Dragon Breath", "Dragon Wings" ],
+      "Elemental": [ "Elemental Toss", "Elemental Motion", "Elemental Blast" ],
+      "Fey": [ "Faerie Dust", "Fey Disappearance", "Fey Glamour" ],
+      "Genie": [ "Genie's Veil", "Heart's Desire", "Wish-Twisted Form" ],
+      "Hag": [ "Jealous Hex", "Horrific Visage", "You're Mine" ],
+      "Harrow": [ "Unraveling Blast", "Invoice the Harrow", "Rewrite Possibility" ],
+      "Imperial": [ "Ancestral Memories", "Extend Spell", "Arcane Countermeasure" ],
+      "Nymph": [ "Nymph's Token", "Blinding Beauty", "Establish Ward" ],
+      "Phoenix": [ "Rejuvenating Flames", "Shroud of Flame", "Cleansing Flames" ],
+      "Psychopomp": [ "Sepulchral Mask", "Spirit Veil", "Shepherd of Souls" ],
+      "Shadow": [ "Dim the Light", "Steal Shadow", "Consuming Darkness" ],
+      "Undead": [ "Touch of Undeath (Sorcerer)", "Drain Life", "Grasping Grave" ],
+      "Wyrmblessed": [ "Dragon Claws", "Dragon Breath", "Dragon Wings" ]
+    }
+  },
+  {
+    "name": "Bookmarks",
+    "matchBy": "bookmark",
+    "options": []
+  },
+  {
+    "name": "Focus Powers - Druid",
+    "matchBy": "filter",
+    "options": [],
+    "filter": {
+      "traits": "druid",
+      "type": "Focus"
+    }
+  },
+  {
+    "name": "Focus Powers - Champion",
+    "matchBy": "filter",
+    "options": [],
+    "filter": {
+      "traits": "champion",
+      "type": "Focus"
+    }
+  },
+  {
+    "name": "Focus Powers - Monk",
+    "matchBy": "filter",
+    "options": [],
+    "filter": {
+      "traits": "monk",
+      "type": "Focus"
+    }
+  },
+  {
+    "name": "Focus Powers - Oracle",
+    "matchBy": "lookup",
+    "options": [
+      {
+        "name": "Shared",
+        "value": "Shared"
+      },
+      {
+        "name": "Ancestors",
+        "value": "Ancestors"
+      },
+      {
+        "name": "Ash",
+        "value": "Ash"
+      },
+      {
+        "name": "Battle",
+        "value": "Battle"
+      },
+      {
+        "name": "Bones",
+        "value": "Bones"
+      },
+      {
+        "name": "Cosmos",
+        "value": "Cosmos"
+      },
+      {
+        "name": "Flames",
+        "value": "Flames"
+      },
+      {
+        "name": "Life",
+        "value": "Life"
+      },
+      {
+        "name": "Lore",
+        "value": "Lore"
+      },
+      {
+        "name": "Tempest",
+        "value": "Tempest"
+      },
+      {
+        "name": "Time",
+        "value": "Time"
+      }
+    ],
+    "lookup": {
+      "Ancestors": [ "Ancestral Touch", "Ancestral Defense", "Ancestral Form" ],
+      "Ash": [ "Ashen Wind", "Incendiary Ashes", "Ash Form" ],
+      "Battle": [ "Call to Arms", "Battlefield Persistence", "Heroic Feat" ],
+      "Bones": [ "Soul Siphon", "Armor of Bones", "Claim Undead" ],
+      "Cosmos": [ "Spray of Stars", "Interstellar Void", "Moonlight Bridge" ],
+      "Flames": [ "Incendiary Aura", "Whirling Flames", "Flaming Fusillade" ],
+      "Life": [ "Life Link", "Delay Affliction", "Life-Giving Form" ],
+      "Lore": [ "Brain Drain", "Access Lore", "Dread Secret" ],
+      "Tempest": [ "Tempest Touch", "Thunderburst", "Tempest Form" ],
+      "Time": [ "Temporal Distortion", "Time Skip", "Manifold Lives" ],
+      "Shared": [ "Vision of Weakness", "Debilitating Dichotomy" ]
+    }
+  },
+  {
+    "name": "Focus Powers - Witch",
+    "matchBy": "filter",
+    "options": [],
+    "filter": {
+      "traits": "witch",
+      "type": "Focus"
+    }
+  },
+  {
+    "name": "Focus Powers - Bard",
+    "matchBy": "filter",
+    "options": [],
+    "filter": {
+      "traits": "bard",
+      "type": "Focus"
+    }
+  },
+  {
+    "name": "Focus Powers - Archetypes",
+    "matchBy": "lookup",
+    "options": [
+      {
+        "name": "Beastmaster",
+        "value": "Beastmaster"
+      },
+      {
+        "name": "Blessed One",
+        "value": "Blessed One"
+      },
+      {
+        "name": "Magic Warrior",
+        "value": "Magic Warrior"
+      },
+      {
+        "name": "Red Mantis",
+        "value": "Red Mantis"
+      },
+      {
+        "name": "Shadowdancer",
+        "value": "Shadowdancer"
+      },
+      {
+        "name": "Student of Perfection",
+        "value": "Student of Perfection"
+      }
+    ],
+    "lookup": {
+      "Beastmaster": [
+        "Heal Animal",
+        "Beastmaster Trance"
+      ],
+      "Blessed One": [ "Lay on Hands", "Protector's Sacrifice" ],
+      "Dragon Disciple": [ "Dragon Breath", "Dragon Wings" ],
+      "Magic Warrior": [
+        "Magic Warrior Aspect",
+        "Magic Warrior Transformation"
+      ],
+      "Red Mantis": [
+        "Mantis Form"
+      ],
+      "Shadowdancer": [
+        "Dance of Darkness",
+        "Shadow Jump",
+        "Shadow Illusion"
+      ],
+      "Student of Perfection": [
+        "Perfect Strike",
+        "Unblinking Flame Revelation",
+        "Unbreaking Wave Advance",
+        "Unfolding Wind Rush",
+        "Untwisting Iron Buffer"
+      ]
+    }
+  },
+  {
+    "name": "Focus Powers - Wizard School",
+    "matchBy": "lookup",
+    "options": [
+      {
+        "name": "Ars Grammatica",
+        "value": "Ars Grammatica"
+      },
+      {
+        "name": "Battle Magic",
+        "value": "Battle Magic"
+      },
+      {
+        "name": "Civic Wizadry",
+        "value": "Civic Wizadry"
+      },
+      {
+        "name": "Mentalism",
+        "value": "Mentalism"
+      },
+      {
+        "name": "Protean Form",
+        "value": "Protean Form"
+      },
+      {
+        "name": "The Boundry",
+        "value": "The Boundry"
+      },
+      {
+        "name": "Unified Magical Theory",
+        "value": "Unified Magical Theory"
+      }
+    ],
+    "lookup": {
+      "Civic Wizadry": [ "Earthworks", "Community Restoration" ],
+      "The Boundry": [ "Fortify Summoning", "Spiral of Horrors" ],
+      "Mentalism": [ "Charming Push", "Invisibility Cloak" ],
+      "Battle Magic": [ "Force Bolt", "Energy Absorption" ],
+      "Unified Magical Theory": [ "Hand of the Apprentice", "Interdisciplinary Incantation" ],
+      "Protean Form": [ "Scramble Body", "Shifting Form" ],
+      "Ars Grammatica": [ "Protective Wards", "Rune of Observation" ]
+    }
+  }
+]
