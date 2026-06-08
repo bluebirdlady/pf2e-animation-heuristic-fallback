@@ -31,8 +31,5 @@
       }
     ]
   },
-  "socket": false,
-  "manifest": "https://raw.githubusercontent.com/bluebirdlady/pf2e-animation-heuristic-fallback/main/module.json",
-  "download": "https://github.com/bluebirdlady/pf2e-animation-heuristic-fallback/archive/refs/heads/main.zip",
-  "url": "https://github.com/bluebirdlady/pf2e-animation-heuristic-fallback"
+  "socket": false
 }
