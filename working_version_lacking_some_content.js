@@ -60,6 +60,15 @@
  * - Gated behind "enableConfigCache" (default on); when off, behavior is
  *   identical to before this phase
  * - Cache auto-clears once it exceeds CONFIG_CACHE_LIMIT (500) entries
+ *
+ * Phase F: Template placement handling
+ * - listenForTemplatePlacement() waits (up to 5s) for the player to place a
+ *   measured template, resolving with the template or null on timeout
+ * - For "burst"-type animations on spells with an area (spell.system.area),
+ *   the ground ring/impact center on the placed template's position when
+ *   available, falling back to target/self positioning otherwise
+ * - Gated behind "useTemplateHandling" (default off); when off, behavior is
+ *   identical to before this phase
  */
 
 // ============================================================
@@ -139,6 +148,14 @@ const registerSettings = () => {
         type: Boolean,
         default: true
     });
+    safeRegister("useTemplateHandling", {
+        name: "Enable Template Placement Handling",
+        hint: "For area spells (burst/cone/line/emanation), briefly wait for you to place a measurement template and center the animation on it.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -161,7 +178,8 @@ const getSettingSafe = (key) => {
         skipCuratedSpells: true,
         randomVariants: false,
         maxConcurrentAnimations: 4,
-        enableConfigCache: true
+        enableConfigCache: true,
+        useTemplateHandling: false
     };
     return fallbacks[key];
 };
@@ -679,6 +697,33 @@ function cacheParsedConfig(key, config) {
     CONFIG_CACHE.set(key, config);
 }
 
+// NEW (Phase F): Waits briefly for the player to place a measured template
+// (e.g. for a burst/cone spell), resolving with the template placeable, or
+// null if none is placed before the timeout. Never throws.
+function listenForTemplatePlacement(timeoutMs = 5000) {
+    return new Promise((resolve) => {
+        let hookId = null;
+        let timer = null;
+
+        const cleanup = () => {
+            if (hookId !== null) Hooks.off("createMeasuredTemplate", hookId);
+            if (timer !== null) clearTimeout(timer);
+        };
+
+        hookId = Hooks.once("createMeasuredTemplate", (templateDoc) => {
+            cleanup();
+            console.debug("PF2e Heuristic | Template placement detected");
+            resolve(templateDoc.object);
+        });
+
+        timer = setTimeout(() => {
+            cleanup();
+            console.debug("PF2e Heuristic | Template placement timeout - using fallback positioning");
+            resolve(null);
+        }, timeoutMs);
+    });
+}
+
 // ============================================================
 // 5. RENDERING PIPELINE WITH VERIFICATION LOGGING
 // ============================================================
@@ -708,6 +753,17 @@ async function executeHeuristicAnimation(spell, token) {
     }
 
     const targets = Array.from(game.user.targets).filter(t => t && canvas.tokens?.placeables.includes(t));
+
+    // NEW (Phase F): For burst/area spells, optionally wait for the player to
+    // place a measured template and center the animation on it. Opt-in,
+    // times out after 5s, and falls back to target/self positioning if no
+    // template is placed (or the spell has no area).
+    let areaTemplate = null;
+    if (getSettingSafe("useTemplateHandling") && animationConfig.type === "burst" && spell.system?.area?.type) {
+        console.debug(`PF2e Heuristic | Awaiting template placement for "${spell.name}"...`);
+        areaTemplate = await listenForTemplatePlacement(5000);
+    }
+
     let seq = new SequenceClass();
 
     // NEW (Phase D): Bracket the entire sequence-building/playback lifecycle
@@ -811,14 +867,20 @@ async function executeHeuristicAnimation(spell, token) {
     }
     // PHASE 4: Burst / Emanation / Splash Pipeline (DYNAMIC CENTER FIXED)
     else if (animationConfig.type === "burst") {
-        const burstCenter = targets.length > 0 ? targets[0] : token;
+        // NEW (Phase F): Prefer a player-placed template's position, falling
+        // back to the original target/self centering when none is available.
+        const burstCenter = areaTemplate || (targets.length > 0 ? targets[0] : token);
+
+        if (areaTemplate) {
+            console.log(`%c[PHASE F] Centering burst on placed template at (${areaTemplate.position?.x}, ${areaTemplate.position?.y})`, "color: #00ccff;");
+        }
 
         if (animationConfig.groundRing) {
             console.log(`%c[DEPLOYING] Burst Ground Ring -> .file(${animationConfig.groundRingVariants ? `[${animationConfig.groundRingVariants.length} variants]` : `"${animationConfig.groundRing}"`})`, "color: #00ccff;");
             seq.effect()
                 .file(animationConfig.groundRingVariants || animationConfig.groundRing)
                 .atLocation(burstCenter)
-                .size(4, { gridUnits: true }) 
+                .size(4, { gridUnits: true })
                 .duration(3000)
                 .fadeIn(300)
                 .fadeOut(800);
@@ -841,7 +903,7 @@ async function executeHeuristicAnimation(spell, token) {
                 console.log(`%c[DEPLOYING] Burst Impact (Self Fallback) -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`})`, "color: #00ccff;");
                 let impactElement = seq.effect()
                     .file(animationConfig.impactVariants || animationConfig.impact)
-                    .atLocation(token)
+                    .atLocation(burstCenter)
                     .size(3, { gridUnits: true });
 
                 if (animationConfig.blend) impactElement.blendMode("ADD");
@@ -919,4 +981,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling)");
