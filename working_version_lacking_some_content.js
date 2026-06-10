@@ -1066,7 +1066,8 @@ function applyCCEffect(token, slug) {
             .name(ccEffectName(token.document.id, slug))
             .fadeIn(300)
             .fadeOut(300)
-            .play();
+            .play()
+            .catch(e => console.debug(`PF2e Heuristic | CC effect playback interrupted (non-fatal): ${e}`));
     } catch (e) {
         console.error("PF2e Heuristic | CC creation error (non-fatal):", e);
     }
