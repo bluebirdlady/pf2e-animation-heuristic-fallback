@@ -53,6 +53,13 @@
  *
  * Bugfix: PHASE 5 (Token Buff route) called the non-existent Sequencer
  * method .tieToToken(); replaced with the correct .attachTo(token).
+ *
+ * Phase E: Configuration caching
+ * - CONFIG_CACHE memoizes parseSpellToAnimation() results per spell
+ *   (keyed by uuid/id/name), so repeat casts skip re-parsing/re-classifying
+ * - Gated behind "enableConfigCache" (default on); when off, behavior is
+ *   identical to before this phase
+ * - Cache auto-clears once it exceeds CONFIG_CACHE_LIMIT (500) entries
  */
 
 // ============================================================
@@ -124,6 +131,14 @@ const registerSettings = () => {
         range: { min: 1, max: 16, step: 1 },
         default: 4
     });
+    safeRegister("enableConfigCache", {
+        name: "Enable Configuration Cache",
+        hint: "Cache spell parsing results for performance (disable if you encounter stale data).",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -145,7 +160,8 @@ const getSettingSafe = (key) => {
         advancedClassification: false,
         skipCuratedSpells: true,
         randomVariants: false,
-        maxConcurrentAnimations: 4
+        maxConcurrentAnimations: 4,
+        enableConfigCache: true
     };
     return fallbacks[key];
 };
@@ -154,6 +170,12 @@ const getSettingSafe = (key) => {
 // 2. CORE CONFIGURATION & DICTIONARIES
 // ============================================================
 const ASSET_CACHE = new Map();
+
+// NEW (Phase E): Caches parseSpellToAnimation() results per spell so the same
+// spell isn't re-parsed/re-classified on every cast. Cleared once it grows
+// past CONFIG_CACHE_LIMIT entries to avoid unbounded growth.
+const CONFIG_CACHE = new Map();
+const CONFIG_CACHE_LIMIT = 500;
 
 // NEW (Phase D): Tracks how many heuristic animation sequences are currently
 // in flight, so a flurry of casts can't pile up unbounded Sequencer work.
@@ -568,6 +590,13 @@ function getCuratedSpellSet() {
 // 4. PARSING ENGINE
 // ============================================================
 function parseSpellToAnimation(spell) {
+    // NEW (Phase E): Return a cached config if this spell was already parsed.
+    const enableConfigCache = getSettingSafe("enableConfigCache");
+    const configCacheKey = spell?.uuid || spell?.id || spell?.name;
+    if (enableConfigCache && configCacheKey && CONFIG_CACHE.has(configCacheKey)) {
+        return CONFIG_CACHE.get(configCacheKey);
+    }
+
     // NEW (Phase A): Defer to curated macros for known spells
     if (getSettingSafe("skipCuratedSpells")) {
         const curatedSet = getCuratedSpellSet();
@@ -577,7 +606,11 @@ function parseSpellToAnimation(spell) {
                 : (spell.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
 
             if (spellSlug && curatedSet.has(spellSlug)) {
-                return { type: "CURATED_SPELL", spellSlug, originalSpellName: spell.name };
+                const curatedConfig = { type: "CURATED_SPELL", spellSlug, originalSpellName: spell.name };
+                if (enableConfigCache && configCacheKey) {
+                    cacheParsedConfig(configCacheKey, curatedConfig);
+                }
+                return curatedConfig;
             }
         }
     }
@@ -628,7 +661,22 @@ function parseSpellToAnimation(spell) {
     // NEW (Part 1.1, extended Phase B): Apply enhanced classification layer
     config = applyEnhancedClassification(config, spell, searchString);
 
+    // NEW (Phase E): Cache the parsed config for future casts of this spell
+    if (enableConfigCache && configCacheKey) {
+        cacheParsedConfig(configCacheKey, config);
+    }
+
     return config;
+}
+
+// NEW (Phase E): Stores a parsed config in CONFIG_CACHE, clearing the whole
+// cache first if it has grown past CONFIG_CACHE_LIMIT entries.
+function cacheParsedConfig(key, config) {
+    if (CONFIG_CACHE.size >= CONFIG_CACHE_LIMIT) {
+        CONFIG_CACHE.clear();
+        console.debug(`PF2e Heuristic | Config cache cleared (size limit of ${CONFIG_CACHE_LIMIT} reached)`);
+    }
+    CONFIG_CACHE.set(key, config);
 }
 
 // ============================================================
@@ -871,4 +919,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching)");
