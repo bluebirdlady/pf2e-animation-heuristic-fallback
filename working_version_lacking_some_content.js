@@ -32,6 +32,15 @@
  *   future Phase G persistent-effects system
  * - Entirely gated behind "advancedClassification" (same flag as Part 1.1);
  *   no effect when that setting is off
+ *
+ * Phase C: Random animation variants
+ * - resolveAssetVariants() collects every EXPLICIT_DATABASE_MAP pattern for
+ *   an asset type/color that resolves to a valid Sequencer entry
+ * - When "randomVariants" is enabled and 2+ variants exist, config gets a
+ *   `<assetType>Variants` array; .file() is called with that array so
+ *   Sequencer picks one at random per cast
+ * - Default off; with 0-1 variants (the common case), behavior is identical
+ *   to before this phase
  */
 
 // ============================================================
@@ -86,6 +95,14 @@ const registerSettings = () => {
         type: Boolean,
         default: true
     });
+    safeRegister("randomVariants", {
+        name: "Use Random Animation Variants",
+        hint: "When multiple matching JB2A animations exist for a spell's color/type, randomly pick among them for visual variety.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -105,7 +122,8 @@ const getSettingSafe = (key) => {
         lingeringEffects: true,
         blendModes: true,
         advancedClassification: false,
-        skipCuratedSpells: true
+        skipCuratedSpells: true,
+        randomVariants: false
     };
     return fallbacks[key];
 };
@@ -347,6 +365,31 @@ function resolveAssetWithFallback(assetType, preferredColor) {
 }
 
 // ============================================================
+// 3.2 RANDOM ANIMATION VARIANTS (NEW - Phase C)
+// ============================================================
+// Collects every EXPLICIT_DATABASE_MAP pattern for an asset type/color that
+// resolves to a valid Sequencer entry, for use as a randomization pool.
+// Only consulted when "randomVariants" is enabled; resolveAssetWithFallback()
+// remains the single-path source of truth otherwise.
+function resolveAssetVariants(assetType, preferredColor) {
+    const cacheKey = `variants-${assetType}-${preferredColor}`;
+    if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
+
+    const variants = [];
+    const structuralPatterns = EXPLICIT_DATABASE_MAP[assetType] || [];
+
+    for (const pattern of structuralPatterns) {
+        const testPath = pattern.replace("{color}", preferredColor);
+        if (!variants.includes(testPath) && isValidSequencerPath(testPath)) {
+            variants.push(testPath);
+        }
+    }
+
+    ASSET_CACHE.set(cacheKey, variants);
+    return variants;
+}
+
+// ============================================================
 // 3.1 ENHANCED CLASSIFICATION APPLIER (NEW - Part 1.1, extended Phase B)
 // ============================================================
 // Non-breaking function that layers classification on top of base config.
@@ -544,6 +587,18 @@ function parseSpellToAnimation(spell) {
     config.projectile = resolveAssetWithFallback("projectile", config.color);
     config.tokenBuff  = resolveAssetWithFallback("tokenBuff", config.color);
 
+    // NEW (Phase C): When enabled, gather variant pools for visual variety.
+    // Only attached when 2+ valid options exist; rendering falls back to the
+    // single resolved path above otherwise.
+    if (getSettingSafe("randomVariants")) {
+        for (const assetType of ["castRing", "groundRing", "impact", "projectile", "tokenBuff"]) {
+            const variants = resolveAssetVariants(assetType, config.color);
+            if (variants.length > 1) {
+                config[`${assetType}Variants`] = variants;
+            }
+        }
+    }
+
     // NEW (Part 1.1, extended Phase B): Apply enhanced classification layer
     config = applyEnhancedClassification(config, spell, searchString);
 
@@ -605,9 +660,9 @@ async function executeHeuristicAnimation(spell, token) {
 
     // PHASE 1: Casting Origin Elements
     if (animationConfig.castRing) {
-        console.log(`%c[DEPLOYING] Cast Ring -> .file("${animationConfig.castRing}")`, "color: #00ccff;");
+        console.log(`%c[DEPLOYING] Cast Ring -> .file(${animationConfig.castRingVariants ? `[${animationConfig.castRingVariants.length} variants]` : `"${animationConfig.castRing}"`})`, "color: #00ccff;");
         seq.effect()
-            .file(animationConfig.castRing)
+            .file(animationConfig.castRingVariants || animationConfig.castRing)
             .atLocation(token)
             .size(token.document.width * 2, { gridUnits: true })
             .fadeIn(200)
@@ -619,9 +674,9 @@ async function executeHeuristicAnimation(spell, token) {
     if (animationConfig.type === "projectile" && targets.length > 0) {
         for (const target of targets) {
             if (animationConfig.projectile) {
-                console.log(`%c[DEPLOYING] Projectile -> .file("${animationConfig.projectile}") to target: ${target.name}`, "color: #00ccff;");
+                console.log(`%c[DEPLOYING] Projectile -> .file(${animationConfig.projectileVariants ? `[${animationConfig.projectileVariants.length} variants]` : `"${animationConfig.projectile}"`}) to target: ${target.name}`, "color: #00ccff;");
                 let effectElement = seq.effect()
-                    .file(animationConfig.projectile)
+                    .file(animationConfig.projectileVariants || animationConfig.projectile)
                     .atLocation(token)
                     .stretchTo(target)
                     .missed(false)
@@ -631,9 +686,9 @@ async function executeHeuristicAnimation(spell, token) {
             }
 
             if (animationConfig.impact) {
-                console.log(`%c[DEPLOYING] Impact -> .file("${animationConfig.impact}") on target: ${target.name}`, "color: #00ccff;");
+                console.log(`%c[DEPLOYING] Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
                 let impactElement = seq.effect()
-                    .file(animationConfig.impact)
+                    .file(animationConfig.impactVariants || animationConfig.impact)
                     .atLocation(target)
                     .size(target.document.width * 1.5, { gridUnits: true })
                     .delay(200);
@@ -642,9 +697,9 @@ async function executeHeuristicAnimation(spell, token) {
             }
 
             if (getSettingSafe("lingeringEffects") && animationConfig.groundRing) {
-                console.log(`%c[DEPLOYING] Lingering Ring -> .file("${animationConfig.groundRing}") on target: ${target.name}`, "color: #00ccff;");
+                console.log(`%c[DEPLOYING] Lingering Ring -> .file(${animationConfig.groundRingVariants ? `[${animationConfig.groundRingVariants.length} variants]` : `"${animationConfig.groundRing}"`}) on target: ${target.name}`, "color: #00ccff;");
                 seq.effect()
-                    .file(animationConfig.groundRing)
+                    .file(animationConfig.groundRingVariants || animationConfig.groundRing)
                     .atLocation(target)
                     .size(target.document.width * 1.2, { gridUnits: true })
                     .duration(2500)
@@ -657,9 +712,9 @@ async function executeHeuristicAnimation(spell, token) {
     else if (animationConfig.type === "melee" && targets.length > 0) {
         for (const target of targets) {
             if (animationConfig.impact) {
-                console.log(`%c[DEPLOYING] Melee Impact -> .file("${animationConfig.impact}") on target: ${target.name}`, "color: #00ccff;");
+                console.log(`%c[DEPLOYING] Melee Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
                 let impactElement = seq.effect()
-                    .file(animationConfig.impact)
+                    .file(animationConfig.impactVariants || animationConfig.impact)
                     .atLocation(target)
                     .size(target.document.width * 1.5, { gridUnits: true });
 
@@ -672,9 +727,9 @@ async function executeHeuristicAnimation(spell, token) {
         const burstCenter = targets.length > 0 ? targets[0] : token;
 
         if (animationConfig.groundRing) {
-            console.log(`%c[DEPLOYING] Burst Ground Ring -> .file("${animationConfig.groundRing}")`, "color: #00ccff;");
+            console.log(`%c[DEPLOYING] Burst Ground Ring -> .file(${animationConfig.groundRingVariants ? `[${animationConfig.groundRingVariants.length} variants]` : `"${animationConfig.groundRing}"`})`, "color: #00ccff;");
             seq.effect()
-                .file(animationConfig.groundRing)
+                .file(animationConfig.groundRingVariants || animationConfig.groundRing)
                 .atLocation(burstCenter)
                 .size(4, { gridUnits: true }) 
                 .duration(3000)
@@ -685,9 +740,9 @@ async function executeHeuristicAnimation(spell, token) {
         if (targets.length > 0) {
             for (const target of targets) {
                 if (animationConfig.impact) {
-                    console.log(`%c[DEPLOYING] Burst Impact -> .file("${animationConfig.impact}") on target: ${target.name}`, "color: #00ccff;");
+                    console.log(`%c[DEPLOYING] Burst Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
                     let impactElement = seq.effect()
-                        .file(animationConfig.impact)
+                        .file(animationConfig.impactVariants || animationConfig.impact)
                         .atLocation(target)
                         .size(target.document.width * 1.5, { gridUnits: true });
 
@@ -696,9 +751,9 @@ async function executeHeuristicAnimation(spell, token) {
             }
         } else {
             if (animationConfig.impact) {
-                console.log(`%c[DEPLOYING] Burst Impact (Self Fallback) -> .file("${animationConfig.impact}")`, "color: #00ccff;");
+                console.log(`%c[DEPLOYING] Burst Impact (Self Fallback) -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`})`, "color: #00ccff;");
                 let impactElement = seq.effect()
-                    .file(animationConfig.impact)
+                    .file(animationConfig.impactVariants || animationConfig.impact)
                     .atLocation(token)
                     .size(3, { gridUnits: true });
 
@@ -709,9 +764,9 @@ async function executeHeuristicAnimation(spell, token) {
     // PHASE 5: Utility / Personal Buff Route
     else {
         if (animationConfig.tokenBuff) {
-            console.log(`%c[DEPLOYING] Token Buff -> .file("${animationConfig.tokenBuff}")`, "color: #00ccff;");
+            console.log(`%c[DEPLOYING] Token Buff -> .file(${animationConfig.tokenBuffVariants ? `[${animationConfig.tokenBuffVariants.length} variants]` : `"${animationConfig.tokenBuff}"`})`, "color: #00ccff;");
             seq.effect()
-                .file(animationConfig.tokenBuff)
+                .file(animationConfig.tokenBuffVariants || animationConfig.tokenBuff)
                 .atLocation(token)
                 .size(token.document.width * 1.2, { gridUnits: true })
                 .duration(4000)
@@ -774,4 +829,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants)");
