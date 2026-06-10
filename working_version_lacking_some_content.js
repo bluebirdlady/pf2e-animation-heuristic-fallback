@@ -1,11 +1,25 @@
 /**
  * PF2e Heuristic Fallback Animation Engine
  * Version: 7.1.1+ Enhanced (With Layered Classification System)
- * 
+ *
  * Part 1.1: Added non-breaking enhanced classification layer
  * - Original keyword routing remains fully functional
  * - New classification is opt-in via "advancedClassification" setting
  * - Layers richer spell understanding without replacing existing logic
+ *
+ * Part 1.2: Added asset fallback chains
+ * - resolveVerifiedAssetPath() behavior unchanged for all existing callers
+ * - resolveAssetWithFallback() tries EXPLICIT_DATABASE_MAP first, then a
+ *   small ASSET_FALLBACK_CHAIN of generic JB2A paths before giving up
+ * - Always degrades gracefully to null, never throws
+ *
+ * Phase A: Added curated spell support
+ * - getCuratedSpellSet() indexes macro names from the "PF2e Animation
+ *   Macros (JB2A)" module (pf2e-jb2a-macros), if installed and active
+ * - Spells matching a curated macro are skipped by the heuristic engine
+ *   (opt-out via "skipCuratedSpells" setting, default on)
+ * - If the module/pack is unavailable, the set is empty and behavior is
+ *   identical to before this phase
  */
 
 // ============================================================
@@ -52,6 +66,14 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    safeRegister("skipCuratedSpells", {
+        name: "Defer to Curated Animation Macros",
+        hint: "If a spell has a hand-crafted macro in the PF2e Animation Macros (JB2A) module, skip the heuristic animation for it.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -66,11 +88,12 @@ const getSettingSafe = (key) => {
             return game.settings.get("pf2e-heuristic-fallback", key);
         }
     } catch(e) {}
-    const fallbacks = { 
-        enable: true, 
-        lingeringEffects: true, 
+    const fallbacks = {
+        enable: true,
+        lingeringEffects: true,
         blendModes: true,
-        advancedClassification: false
+        advancedClassification: false,
+        skipCuratedSpells: true
     };
     return fallbacks[key];
 };
@@ -177,6 +200,27 @@ const ENHANCED_CLASSIFICATION = {
 // ============================================================
 // 3. SILENT SAFESTOP VALIDATION ENGINE
 // ============================================================
+function isValidSequencerPath(testPath) {
+    if (typeof Sequencer?.Database?.getEntry !== 'function') {
+        return false;
+    }
+
+    try {
+        const entry = Sequencer.Database.getEntry(testPath, { softFail: true });
+        if (entry) {
+            const rawStringified = JSON.stringify(entry);
+            if (rawStringified.includes(':""') || rawStringified.includes(':\\"\\"') || !rawStringified.includes('.webm')) {
+                return false;
+            }
+            if (entry.file !== undefined || entry.children !== undefined) {
+                return true;
+            }
+        }
+    } catch (error) {}
+
+    return false;
+}
+
 function resolveVerifiedAssetPath(assetType, preferredColor) {
     const cacheKey = `${assetType}-${preferredColor}`;
     if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
@@ -189,20 +233,63 @@ function resolveVerifiedAssetPath(assetType, preferredColor) {
 
     for (const pattern of structuralPatterns) {
         const testPath = pattern.replace("{color}", preferredColor);
+        if (isValidSequencerPath(testPath)) {
+            ASSET_CACHE.set(cacheKey, testPath);
+            return testPath;
+        }
+    }
 
-        try {
-            const entry = Sequencer.Database.getEntry(testPath, { softFail: true });
-            if (entry) {
-                const rawStringified = JSON.stringify(entry);
-                if (rawStringified.includes(':""') || rawStringified.includes(':\\"\\"') || !rawStringified.includes('.webm')) {
-                    continue;
-                }
-                if (entry.file !== undefined || entry.children !== undefined) {
-                    ASSET_CACHE.set(cacheKey, testPath);
-                    return testPath;
-                }
-            }
-        } catch (error) {}
+    ASSET_CACHE.set(cacheKey, null);
+    return null;
+}
+
+// ============================================================
+// 3.1 ASSET FALLBACK CHAINS (NEW - Part 1.2)
+// ============================================================
+// Last-resort generators tried only if EXPLICIT_DATABASE_MAP yields nothing.
+// Each entry is a function taking the preferred color and returning a path to test.
+const ASSET_FALLBACK_CHAIN = {
+    castRing: [
+        (color) => `jb2a.magic_signs.circle.02.abjuration.${color}`,
+        () => "jb2a.magic_signs.circle.02.abjuration.blue",
+        () => "jb2a.magic_signs.circle.ground.blue"
+    ],
+    groundRing: [
+        (color) => `jb2a.magic_signs.circle.02.abjuration.${color}`,
+        () => "jb2a.magic_signs.circle.02.abjuration.blue",
+        () => "jb2a.magic_signs.circle.ground.blue"
+    ],
+    impact: [
+        (color) => `jb2a.impact.themed.${color}`,
+        () => "jb2a.impact.001.blue"
+    ],
+    projectile: [
+        (color) => `jb2a.energy_strands.range.standard.${color}`,
+        () => "jb2a.magic_missile.blue"
+    ],
+    tokenBuff: [
+        (color) => `jb2a.energy_field.01.${color}`,
+        () => "jb2a.shimmer.01.blue"
+    ]
+};
+
+// Extends resolveVerifiedAssetPath with a final pass through ASSET_FALLBACK_CHAIN
+// if the explicit database map produced no match. Always safe: returns null on
+// total failure, same as resolveVerifiedAssetPath did before.
+function resolveAssetWithFallback(assetType, preferredColor) {
+    const direct = resolveVerifiedAssetPath(assetType, preferredColor);
+    if (direct) return direct;
+
+    const cacheKey = `fallback-${assetType}-${preferredColor}`;
+    if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
+
+    const chain = ASSET_FALLBACK_CHAIN[assetType] || [];
+    for (const chainFn of chain) {
+        const testPath = chainFn(preferredColor);
+        if (isValidSequencerPath(testPath)) {
+            ASSET_CACHE.set(cacheKey, testPath);
+            return testPath;
+        }
     }
 
     ASSET_CACHE.set(cacheKey, null);
@@ -258,13 +345,63 @@ function applyEnhancedClassification(baseConfig, spell) {
 }
 
 // ============================================================
+// 3.2 CURATED SPELL SUPPORT (NEW - Part 2 / Phase A)
+// ============================================================
+// Builds a one-time set of spell slugs that already have hand-crafted
+// macros in the "PF2e Animation Macros (JB2A)" module. If a spell is in
+// this set, the heuristic engine steps aside so the curated macro
+// (triggered by that module's own hooks) is the only animation that plays.
+function getCuratedSpellSet() {
+    if (globalThis._CURATED_SPELL_CACHE) return globalThis._CURATED_SPELL_CACHE;
+
+    const slugs = new Set();
+    try {
+        const macroModule = game.modules?.get("pf2e-jb2a-macros");
+        if (macroModule?.active) {
+            for (const pack of game.packs) {
+                if (pack.metadata?.packageName !== "pf2e-jb2a-macros") continue;
+                if (pack.metadata?.type !== "Macro") continue;
+
+                for (const entry of pack.index) {
+                    const name = entry.name;
+                    if (!name) continue;
+                    const slug = typeof name.slugify === "function"
+                        ? name.slugify({ strict: true })
+                        : name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                    if (slug) slugs.add(slug);
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("PF2e Heuristic | Curated spell pack unavailable:", e.message);
+    }
+
+    globalThis._CURATED_SPELL_CACHE = slugs;
+    return slugs;
+}
+
+// ============================================================
 // 4. PARSING ENGINE
 // ============================================================
 function parseSpellToAnimation(spell) {
+    // NEW (Phase A): Defer to curated macros for known spells
+    if (getSettingSafe("skipCuratedSpells")) {
+        const curatedSet = getCuratedSpellSet();
+        if (curatedSet.size > 0) {
+            const spellSlug = spell.slug || (typeof spell.name?.slugify === "function"
+                ? spell.name.slugify({ strict: true })
+                : (spell.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
+
+            if (spellSlug && curatedSet.has(spellSlug)) {
+                return { type: "CURATED_SPELL", spellSlug, originalSpellName: spell.name };
+            }
+        }
+    }
+
     const searchString = `${spell.name} ${spell.system?.description?.value || ""}`.toLowerCase();
     let config = {
         color: "blue",
-        type: "projectile", 
+        type: "projectile",
         blend: false
     };
 
@@ -286,11 +423,11 @@ function parseSpellToAnimation(spell) {
         config.type = "utility";
     }
 
-    config.castRing   = resolveVerifiedAssetPath("castRing", config.color);
-    config.groundRing = resolveVerifiedAssetPath("groundRing", config.color);
-    config.impact     = resolveVerifiedAssetPath("impact", config.color);
-    config.projectile = resolveVerifiedAssetPath("projectile", config.color);
-    config.tokenBuff  = resolveVerifiedAssetPath("tokenBuff", config.color);
+    config.castRing   = resolveAssetWithFallback("castRing", config.color);
+    config.groundRing = resolveAssetWithFallback("groundRing", config.color);
+    config.impact     = resolveAssetWithFallback("impact", config.color);
+    config.projectile = resolveAssetWithFallback("projectile", config.color);
+    config.tokenBuff  = resolveAssetWithFallback("tokenBuff", config.color);
 
     // NEW (Part 1.1): Apply enhanced classification layer
     config = applyEnhancedClassification(config, spell);
@@ -308,6 +445,16 @@ async function executeHeuristicAnimation(spell, token) {
     if (!SequenceClass) return;
 
     const animationConfig = parseSpellToAnimation(spell);
+
+    // NEW (Phase A): Step aside for spells with a curated macro
+    if (animationConfig.type === "CURATED_SPELL") {
+        console.log(
+            `%cPF2E HEURISTIC | Curated macro exists for "${animationConfig.originalSpellName}" (slug: ${animationConfig.spellSlug}) - skipping heuristic animation.`,
+            "color: #99ff99; font-weight: bold;"
+        );
+        return;
+    }
+
     const targets = Array.from(game.user.targets).filter(t => t && canvas.tokens?.placeables.includes(t));
     let seq = new SequenceClass();
 
@@ -510,4 +657,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer Added)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support)");
