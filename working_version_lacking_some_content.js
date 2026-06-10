@@ -69,6 +69,16 @@
  *   available, falling back to target/self positioning otherwise
  * - Gated behind "useTemplateHandling" (default off); when off, behavior is
  *   identical to before this phase
+ *
+ * Phase G: Persistent crowd-control effects (beta, opt-in)
+ * - createItem/deleteItem hooks watch for restraint conditions (immobilized,
+ *   restrained, paralyzed, grabbed) and attach/remove a looping overlay
+ *   effect on the affected token via Sequencer's .persist()
+ * - Effects are named "restraint-{tokenId}-{slug}" for reliable cleanup;
+ *   a deleteToken hook fail-safes any lingering effects on token removal
+ * - Gated behind "enableCCEffects" (default off); every hook handler is
+ *   wrapped in try/catch so failures here are non-fatal and never affect
+ *   the rest of the module
  */
 
 // ============================================================
@@ -156,6 +166,14 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    safeRegister("enableCCEffects", {
+        name: "Enable Persistent Crowd-Control Effects (Beta)",
+        hint: "Show a looping overlay effect on tokens afflicted with restraint conditions (immobilized, restrained, paralyzed, grabbed), removed automatically when the condition ends.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -179,7 +197,8 @@ const getSettingSafe = (key) => {
         randomVariants: false,
         maxConcurrentAnimations: 4,
         enableConfigCache: true,
-        useTemplateHandling: false
+        useTemplateHandling: false,
+        enableCCEffects: false
     };
     return fallbacks[key];
 };
@@ -981,4 +1000,119 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling)");
+// ============================================================
+// 7. PERSISTENT CROWD-CONTROL EFFECTS (NEW - Phase G, opt-in/beta)
+// ============================================================
+// Attaches a small looping overlay to a token while it has a restraint/CC
+// condition, removing it again when the condition ends. Entirely gated
+// behind "enableCCEffects" (default off). Every operation is wrapped in
+// try/catch so a failure here can never break the rest of the module.
+const CC_SLUGS = ["immobilized", "restrained", "paralyzed", "grabbed"];
+
+function ccEffectName(tokenId, slug) {
+    return `restraint-${tokenId}-${slug}`;
+}
+
+function applyCCEffect(token, slug) {
+    try {
+        if (!getSettingSafe("enableCCEffects")) return;
+
+        const SequenceClass = typeof Sequence !== 'undefined' ? Sequence : game.modules.get("sequencer")?.api?.Sequence;
+        if (!SequenceClass || !token) return;
+
+        const overlay = ENHANCED_CLASSIFICATION.restraints.default.overlay;
+        if (!isValidSequencerPath(overlay)) return;
+
+        console.debug(`PF2e Heuristic | Applying persistent CC effect "${slug}" to token "${token.name}"`);
+
+        new SequenceClass()
+            .effect()
+            .file(overlay)
+            .attachTo(token)
+            .persist()
+            .name(ccEffectName(token.document.id, slug))
+            .fadeIn(300)
+            .fadeOut(300)
+            .play();
+    } catch (e) {
+        console.error("PF2e Heuristic | CC creation error (non-fatal):", e);
+    }
+}
+
+function clearCCEffect(token, slug) {
+    try {
+        const SequencerAPI = typeof Sequencer !== 'undefined' ? Sequencer : game.modules.get("sequencer")?.api;
+        if (!SequencerAPI?.EffectManager || !token) return;
+
+        console.debug(`PF2e Heuristic | Clearing persistent CC effect "${slug}" from token "${token.name}"`);
+        SequencerAPI.EffectManager.endEffects({ name: ccEffectName(token.document.id, slug) });
+    } catch (e) {
+        console.error("PF2e Heuristic | CC deletion error (non-fatal):", e);
+    }
+}
+
+// NEW (Phase G): Fail-safe cleanup - removes any lingering CC overlays for a
+// token, e.g. when the token itself is deleted from the scene.
+function clearAllCCEffectsForToken(tokenId) {
+    try {
+        const SequencerAPI = typeof Sequencer !== 'undefined' ? Sequencer : game.modules.get("sequencer")?.api;
+        if (!SequencerAPI?.EffectManager || !tokenId) return;
+
+        for (const slug of CC_SLUGS) {
+            SequencerAPI.EffectManager.endEffects({ name: ccEffectName(tokenId, slug) });
+        }
+    } catch (e) {
+        console.error("PF2e Heuristic | CC cleanup error (non-fatal):", e);
+    }
+}
+
+(globalThis._pf2eHeuristicCCHookIds || []).forEach(({ hook, id }) => Hooks.off(hook, id));
+globalThis._pf2eHeuristicCCHookIds = [];
+
+globalThis._pf2eHeuristicCCHookIds.push({
+    hook: "createItem",
+    id: Hooks.on("createItem", (item) => {
+        try {
+            if (!getSettingSafe("enableCCEffects")) return;
+            if (item.type !== "condition" || !CC_SLUGS.includes(item.slug)) return;
+
+            const tokens = item.parent?.getActiveTokens?.() || [];
+            for (const token of tokens) {
+                applyCCEffect(token, item.slug);
+            }
+        } catch (e) {
+            console.error("PF2e Heuristic | CC creation error (non-fatal):", e);
+        }
+    })
+});
+
+globalThis._pf2eHeuristicCCHookIds.push({
+    hook: "deleteItem",
+    id: Hooks.on("deleteItem", (item) => {
+        try {
+            if (!getSettingSafe("enableCCEffects")) return;
+            if (item.type !== "condition" || !CC_SLUGS.includes(item.slug)) return;
+
+            const tokens = item.parent?.getActiveTokens?.() || [];
+            for (const token of tokens) {
+                clearCCEffect(token, item.slug);
+            }
+        } catch (e) {
+            console.error("PF2e Heuristic | CC deletion error (non-fatal):", e);
+        }
+    })
+});
+
+globalThis._pf2eHeuristicCCHookIds.push({
+    hook: "deleteToken",
+    id: Hooks.on("deleteToken", (tokenDoc) => {
+        try {
+            if (!getSettingSafe("enableCCEffects")) return;
+            clearAllCCEffectsForToken(tokenDoc.id);
+        } catch (e) {
+            console.error("PF2e Heuristic | CC token-cleanup error (non-fatal):", e);
+        }
+    })
+});
+
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects)");
