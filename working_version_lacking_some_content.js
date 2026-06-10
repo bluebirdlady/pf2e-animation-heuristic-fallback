@@ -18,8 +18,20 @@
  *   Macros (JB2A)" module (pf2e-jb2a-macros), if installed and active
  * - Spells matching a curated macro are skipped by the heuristic engine
  *   (opt-out via "skipCuratedSpells" setting, default on)
+ * - CURATED_SET_EXCLUDE filters out admin/utility macros (e.g. "Cone
+ *   Template", "Export Autorec JSON") whose generic names could collide
+ *   with real spell slugs
  * - If the module/pack is unavailable, the set is empty and behavior is
  *   identical to before this phase
+ *
+ * Phase B: Enhanced keyword classification
+ * - ENHANCED_KEYWORD_MAP adds school/tradition/condition keyword detection
+ *   as a fallback when spell traits don't directly name them
+ * - Detects restraint/CC condition keywords (entangled, restrained,
+ *   immobilized, grabbed, paralyzed) and records them on the config for a
+ *   future Phase G persistent-effects system
+ * - Entirely gated behind "advancedClassification" (same flag as Part 1.1);
+ *   no effect when that setting is off
  */
 
 // ============================================================
@@ -198,6 +210,44 @@ const ENHANCED_CLASSIFICATION = {
 };
 
 // ============================================================
+// 2.2 ENHANCED KEYWORD MAP (NEW - Phase B)
+// ============================================================
+// Secondary keyword dictionary used only by applyEnhancedClassification()
+// (i.e. only when "advancedClassification" is enabled). Kept separate from
+// KEYWORD_MAP so the existing color/blend-mode routing loop (which stops at
+// the first match) is completely unaffected.
+const ENHANCED_KEYWORD_MAP = {
+    // School keywords (used as a fallback when traits don't include the school)
+    evocation:     { school: "evocation" },
+    necromancy:    { school: "necromancy" },
+    enchantment:   { school: "enchantment" },
+    illusion:      { school: "illusion" },
+    transmutation: { school: "transmutation" },
+    abjuration:    { school: "abjuration" },
+    conjuration:   { school: "conjuration" },
+    divination:    { school: "divination" },
+
+    // Tradition keywords (fallback when traits don't include the tradition)
+    arcane: { tradition: "arcane" },
+    divine: { tradition: "divine" },
+    occult: { tradition: "occult" },
+    primal: { tradition: "primal" },
+
+    // Restraint / crowd-control condition keywords (informational only for
+    // now - consumed by a future Phase G persistent-effects system)
+    entangle:    { condition: "entangled" },
+    entangled:   { condition: "entangled" },
+    restrain:    { condition: "restrained" },
+    restrained:  { condition: "restrained" },
+    immobilize:  { condition: "immobilized" },
+    immobilized: { condition: "immobilized" },
+    grab:        { condition: "grabbed" },
+    grabbed:     { condition: "grabbed" },
+    paralyze:    { condition: "paralyzed" },
+    paralyzed:   { condition: "paralyzed" }
+};
+
+// ============================================================
 // 3. SILENT SAFESTOP VALIDATION ENGINE
 // ============================================================
 function isValidSequencerPath(testPath) {
@@ -297,11 +347,11 @@ function resolveAssetWithFallback(assetType, preferredColor) {
 }
 
 // ============================================================
-// 3.1 ENHANCED CLASSIFICATION APPLIER (NEW - Part 1.1)
+// 3.1 ENHANCED CLASSIFICATION APPLIER (NEW - Part 1.1, extended Phase B)
 // ============================================================
 // Non-breaking function that layers classification on top of base config.
 // If advancedClassification is disabled, this is a no-op passthrough.
-function applyEnhancedClassification(baseConfig, spell) {
+function applyEnhancedClassification(baseConfig, spell, searchString = "") {
     // Early return if feature not enabled
     if (!getSettingSafe("advancedClassification")) {
         return baseConfig;
@@ -314,7 +364,7 @@ function applyEnhancedClassification(baseConfig, spell) {
 
     try {
         const traits = spell.system.traits?.value || [];
-        
+
         // Attempt to detect tradition from traits
         const traditionKey = traits.find(t => ENHANCED_CLASSIFICATION.traditions[t]);
         if (traditionKey) {
@@ -322,7 +372,7 @@ function applyEnhancedClassification(baseConfig, spell) {
             baseConfig.traditionCircle = ENHANCED_CLASSIFICATION.traditions[traditionKey];
             console.debug(`PF2e Heuristic | Classification: Tradition detected (${traditionKey})`);
         }
-        
+
         // Attempt to detect school from traits
         const schoolKey = traits.find(t => ENHANCED_CLASSIFICATION.schools[t]);
         if (schoolKey) {
@@ -330,9 +380,54 @@ function applyEnhancedClassification(baseConfig, spell) {
             baseConfig.schoolOverlay = ENHANCED_CLASSIFICATION.schools[schoolKey];
             console.debug(`PF2e Heuristic | Classification: School detected (${schoolKey})`);
         }
-        
+
+        // NEW (Phase B): Keyword-based fallback for tradition/school when
+        // traits didn't directly name them (e.g. trait list omits "evocation"
+        // but the description clearly describes an evocation effect).
+        if (!baseConfig.traditionKey || !baseConfig.schoolKey) {
+            for (const [keyword, data] of Object.entries(ENHANCED_KEYWORD_MAP)) {
+                const matched = traits.includes(keyword) || searchString.includes(keyword);
+                if (!matched) continue;
+
+                if (!baseConfig.traditionKey && data.tradition && ENHANCED_CLASSIFICATION.traditions[data.tradition]) {
+                    baseConfig.traditionKey = data.tradition;
+                    baseConfig.traditionCircle = ENHANCED_CLASSIFICATION.traditions[data.tradition];
+                    console.debug(`PF2e Heuristic | Classification: Tradition detected via keyword "${keyword}" (${data.tradition})`);
+                }
+
+                if (!baseConfig.schoolKey && data.school && ENHANCED_CLASSIFICATION.schools[data.school]) {
+                    baseConfig.schoolKey = data.school;
+                    baseConfig.schoolOverlay = ENHANCED_CLASSIFICATION.schools[data.school];
+                    console.debug(`PF2e Heuristic | Classification: School detected via keyword "${keyword}" (${data.school})`);
+                }
+
+                if (baseConfig.traditionKey && baseConfig.schoolKey) break;
+            }
+        }
+
+        // NEW (Phase B): Detect restraint / crowd-control conditions.
+        // Informational only for now - intended for a future Phase G
+        // persistent-effects system, but harmless to compute and log here.
+        const detectedConditions = [];
+        for (const [keyword, data] of Object.entries(ENHANCED_KEYWORD_MAP)) {
+            if (!data.condition) continue;
+            if ((traits.includes(keyword) || searchString.includes(keyword)) && !detectedConditions.includes(data.condition)) {
+                detectedConditions.push(data.condition);
+            }
+        }
+        if (detectedConditions.length > 0) {
+            baseConfig.detectedConditions = detectedConditions;
+
+            const restraintKey = traits.includes("nature") ? "nature"
+                : (traits.includes("force") || searchString.includes("force")) ? "force"
+                : "default";
+            baseConfig.restraintKey = restraintKey;
+            baseConfig.restraintOverlay = ENHANCED_CLASSIFICATION.restraints[restraintKey];
+            console.debug(`PF2e Heuristic | Classification: Restraint conditions detected (${detectedConditions.join(", ")}), overlay set: ${restraintKey}`);
+        }
+
         // Log classification attempt for debugging
-        if (traditionKey || schoolKey) {
+        if (baseConfig.traditionKey || baseConfig.schoolKey || detectedConditions.length > 0) {
             console.debug(`PF2e Heuristic | Enhanced classification applied to: ${spell.name}`);
         }
 
@@ -351,6 +446,26 @@ function applyEnhancedClassification(baseConfig, spell) {
 // macros in the "PF2e Animation Macros (JB2A)" module. If a spell is in
 // this set, the heuristic engine steps aside so the curated macro
 // (triggered by that module's own hooks) is the only animation that plays.
+//
+// A handful of macros in that pack are admin/utility tools rather than
+// spell animations (e.g. "Cone Template", "Export Autorec JSON"). Their
+// names are generic enough that a real spell could collide with them, so
+// they're excluded from the curated set entirely.
+const CURATED_SET_EXCLUDE = new Set([
+    "action-counter",
+    "add-effect",
+    "blacklist-animations",
+    "cone-template",
+    "cone-hands",
+    "dismiss-selected-token",
+    "export-autorec-json",
+    "open-aa",
+    "persistent-conditions",
+    "variable-templates",
+    "mirror-reflection-animation",
+    "opacity-1"
+]);
+
 function getCuratedSpellSet() {
     if (globalThis._CURATED_SPELL_CACHE) return globalThis._CURATED_SPELL_CACHE;
 
@@ -368,7 +483,7 @@ function getCuratedSpellSet() {
                     const slug = typeof name.slugify === "function"
                         ? name.slugify({ strict: true })
                         : name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                    if (slug) slugs.add(slug);
+                    if (slug && !CURATED_SET_EXCLUDE.has(slug)) slugs.add(slug);
                 }
             }
         }
@@ -429,8 +544,8 @@ function parseSpellToAnimation(spell) {
     config.projectile = resolveAssetWithFallback("projectile", config.color);
     config.tokenBuff  = resolveAssetWithFallback("tokenBuff", config.color);
 
-    // NEW (Part 1.1): Apply enhanced classification layer
-    config = applyEnhancedClassification(config, spell);
+    // NEW (Part 1.1, extended Phase B): Apply enhanced classification layer
+    config = applyEnhancedClassification(config, spell, searchString);
 
     return config;
 }
@@ -474,15 +589,17 @@ async function executeHeuristicAnimation(spell, token) {
         animationConfig.tokenBuff ? "color: #00ff66;" : "color: #ff3333;"
     );
 
-    // NEW (Part 1.1): Log classification info if present
-    if (animationConfig.traditionCircle || animationConfig.schoolOverlay) {
+    // NEW (Part 1.1, extended Phase B): Log classification info if present
+    if (animationConfig.traditionCircle || animationConfig.schoolOverlay || animationConfig.detectedConditions?.length) {
         console.log(
             `%cPF2E HEURISTIC | ENHANCED CLASSIFICATION:\n` +
             `%c  • Tradition: ${animationConfig.traditionKey || "none"}\n` +
-            `%c  • School: ${animationConfig.schoolKey || "none"}`,
+            `%c  • School: ${animationConfig.schoolKey || "none"}\n` +
+            `%c  • Conditions: ${animationConfig.detectedConditions?.length ? animationConfig.detectedConditions.join(", ") : "none"}`,
             "color: #99ff99; font-weight: bold;",
             animationConfig.traditionCircle ? "color: #00ff99;" : "color: #666666;",
-            animationConfig.schoolOverlay ? "color: #00ff99;" : "color: #666666;"
+            animationConfig.schoolOverlay ? "color: #00ff99;" : "color: #666666;",
+            animationConfig.detectedConditions?.length ? "color: #00ff99;" : "color: #666666;"
         );
     }
 
@@ -657,4 +774,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification)");
