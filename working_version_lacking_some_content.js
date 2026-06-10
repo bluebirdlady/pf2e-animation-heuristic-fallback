@@ -79,6 +79,15 @@
  * - Gated behind "enableCCEffects" (default off); every hook handler is
  *   wrapped in try/catch so failures here are non-fatal and never affect
  *   the rest of the module
+ * - resolveCCOverlay() picks the first valid overlay from
+ *   CC_OVERLAY_CANDIDATES (memoized) as defense-in-depth in case an
+ *   overlay path is unavailable in a given JB2A install
+ *
+ * Bugfix: ENHANCED_CLASSIFICATION.restraints overlay paths referenced
+ * non-existent JB2A assets ("jb2a.chains.standard",
+ * "jb2a.spectral_chains.standard", "jb2a.vines.growth.green"). Replaced
+ * with valid looping assets (jb2a.markers.chain.diamond.loop.01.grey/purple,
+ * jb2a.entangle.02.loop.02.green) suitable for persist().
  */
 
 // ============================================================
@@ -306,9 +315,9 @@ const ENHANCED_CLASSIFICATION = {
         divination:    { overlay: "jb2a.eye",            color: "gold" }
     },
     restraints: {
-        nature:  { ground: "jb2a.entangle.green",    overlay: "jb2a.vines.growth.green" },
-        force:   { ground: "jb2a.shattered_earth",  overlay: "jb2a.spectral_chains.standard" },
-        default: { ground: "jb2a.magic_signs.circle",overlay: "jb2a.chains.standard" }
+        nature:  { ground: "jb2a.entangle.green",    overlay: "jb2a.entangle.02.loop.02.green" },
+        force:   { ground: "jb2a.shattered_earth",  overlay: "jb2a.markers.chain.diamond.loop.01.purple" },
+        default: { ground: "jb2a.magic_signs.circle",overlay: "jb2a.markers.chain.diamond.loop.01.grey" }
     }
 };
 
@@ -1009,8 +1018,29 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
 // try/catch so a failure here can never break the rest of the module.
 const CC_SLUGS = ["immobilized", "restrained", "paralyzed", "grabbed"];
 
+// NEW (Phase G): Candidate overlays for the CC restraint effect, in order of
+// preference. Not every JB2A install (free vs Patreon) has all of these, so
+// the first one that validates against the Sequencer Database is used.
+const CC_OVERLAY_CANDIDATES = [
+    ENHANCED_CLASSIFICATION.restraints.default.overlay,
+    ENHANCED_CLASSIFICATION.restraints.force.overlay,
+    ENHANCED_CLASSIFICATION.restraints.nature.overlay,
+    "jb2a.energy_field.02.above.purple"
+];
+
 function ccEffectName(tokenId, slug) {
     return `restraint-${tokenId}-${slug}`;
+}
+
+// NEW (Phase G): Resolves the first valid CC overlay path, memoized in
+// ASSET_CACHE. Returns null if none of the candidates are valid.
+function resolveCCOverlay() {
+    const cacheKey = "ccOverlay";
+    if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
+
+    const overlay = CC_OVERLAY_CANDIDATES.find(path => isValidSequencerPath(path)) || null;
+    ASSET_CACHE.set(cacheKey, overlay);
+    return overlay;
 }
 
 function applyCCEffect(token, slug) {
@@ -1020,8 +1050,11 @@ function applyCCEffect(token, slug) {
         const SequenceClass = typeof Sequence !== 'undefined' ? Sequence : game.modules.get("sequencer")?.api?.Sequence;
         if (!SequenceClass || !token) return;
 
-        const overlay = ENHANCED_CLASSIFICATION.restraints.default.overlay;
-        if (!isValidSequencerPath(overlay)) return;
+        const overlay = resolveCCOverlay();
+        if (!overlay) {
+            console.debug(`PF2e Heuristic | No valid CC overlay asset found - skipping effect for "${slug}"`);
+            return;
+        }
 
         console.debug(`PF2e Heuristic | Applying persistent CC effect "${slug}" to token "${token.name}"`);
 
