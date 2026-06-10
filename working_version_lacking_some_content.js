@@ -41,6 +41,15 @@
  *   Sequencer picks one at random per cast
  * - Default off; with 0-1 variants (the common case), behavior is identical
  *   to before this phase
+ *
+ * Phase D: Concurrency protection
+ * - activeSequences tracks how many heuristic animation sequences are
+ *   currently mid-flight (incremented/decremented around the full
+ *   sequence build + seq.play())
+ * - "maxConcurrentAnimations" (default 4, range 1-16) caps how many can run
+ *   at once; additional casts are skipped (not queued) once the cap is hit
+ * - seq.play() is now awaited so the counter accurately reflects in-progress
+ *   playback, not just sequence construction
  */
 
 // ============================================================
@@ -103,6 +112,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    safeRegister("maxConcurrentAnimations", {
+        name: "Max Concurrent Animations",
+        hint: "Limit how many heuristic animation sequences can play at once. Additional casts are skipped (not queued) until one finishes.",
+        scope: "client",
+        config: true,
+        type: Number,
+        range: { min: 1, max: 16, step: 1 },
+        default: 4
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -123,7 +141,8 @@ const getSettingSafe = (key) => {
         blendModes: true,
         advancedClassification: false,
         skipCuratedSpells: true,
-        randomVariants: false
+        randomVariants: false,
+        maxConcurrentAnimations: 4
     };
     return fallbacks[key];
 };
@@ -132,6 +151,10 @@ const getSettingSafe = (key) => {
 // 2. CORE CONFIGURATION & DICTIONARIES
 // ============================================================
 const ASSET_CACHE = new Map();
+
+// NEW (Phase D): Tracks how many heuristic animation sequences are currently
+// in flight, so a flurry of casts can't pile up unbounded Sequencer work.
+let activeSequences = 0;
 
 const KEYWORD_MAP = {
     fire: { color: "orange", trait: "fire" },
@@ -625,8 +648,21 @@ async function executeHeuristicAnimation(spell, token) {
         return;
     }
 
+    // NEW (Phase D): Concurrency protection - if too many sequences are
+    // already in flight, skip this one rather than piling on more canvas work.
+    const maxConcurrent = getSettingSafe("maxConcurrentAnimations") || 4;
+    if (activeSequences >= maxConcurrent) {
+        console.debug(`PF2e Heuristic | Max concurrent animations (${maxConcurrent}) reached - skipping animation for "${spell.name}".`);
+        return;
+    }
+
     const targets = Array.from(game.user.targets).filter(t => t && canvas.tokens?.placeables.includes(t));
     let seq = new SequenceClass();
+
+    // NEW (Phase D): Bracket the entire sequence-building/playback lifecycle
+    // so the in-flight counter is always decremented, even on error.
+    activeSequences++;
+    try {
 
     // PRINT ALL CHOSEN TAGS BEFORE SENDING TO SEQUENCER
     console.log(
@@ -777,7 +813,10 @@ async function executeHeuristicAnimation(spell, token) {
     }
 
     console.log(`%c[SEQUENCER] Handing pipeline off to canvas execution engine.`, "color: #9900ff; font-weight: bold;");
-    seq.play();
+    await seq.play();
+    } finally {
+        activeSequences--;
+    }
 }
 
 // ============================================================
@@ -829,4 +868,4 @@ globalThis._pf2eHeuristicHookId = Hooks.on("createChatMessage", (message, option
     }, 200);
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection)");
