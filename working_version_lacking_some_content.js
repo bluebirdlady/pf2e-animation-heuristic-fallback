@@ -88,6 +88,21 @@
  * "jb2a.spectral_chains.standard", "jb2a.vines.growth.green"). Replaced
  * with valid looping assets (jb2a.markers.chain.diamond.loop.01.grey/purple,
  * jb2a.entangle.02.loop.02.green) suitable for persist().
+ *
+ * Phase H: Elemental area shapes + expanded element coverage
+ * - parseSpellToAnimation() now checks spell.system.traits.value for a
+ *   KEYWORD_MAP match before falling back to description-string search,
+ *   which is more reliable than text matching
+ * - KEYWORD_MAP expanded to cover the full PF2e damage/alignment trait set
+ *   (mental, vitality/positive/radiant, chaotic, evil, good, lawful, bleed,
+ *   negative)
+ * - For spells with area.type "cone" or "line", resolveElementalAreaAsset()
+ *   picks an element-specific JB2A breath-weapon effect (fire/cold/acid/
+ *   lightning/poison) when available; new "cone"/"line" pipelines render it
+ *   rotated/stretched toward a placed template or the first target
+ * - If no elemental area asset matches (e.g. mental, force), the spell falls
+ *   back to its previously-determined type (burst/projectile/etc) -
+ *   completely unchanged behavior for those spells
  */
 
 // ============================================================
@@ -251,10 +266,23 @@ const KEYWORD_MAP = {
     holy: { color: "holy", trait: "good" },
     divine: { color: "holy", trait: "good" },
     necrotic: { color: "dark_purple", trait: "negative" },
+    negative: { color: "dark_purple", trait: "negative" },
     void: { color: "dark_purple", trait: "negative" },
     death: { color: "dark_purple", trait: "negative" },
     poison: { color: "green", trait: "poison" },
-    toxic: { color: "green", trait: "poison" }
+    toxic: { color: "green", trait: "poison" },
+    // NEW (Phase H): Additional PF2e damage/alignment trait coverage
+    mental: { color: "pink", trait: "mental" },
+    psychic: { color: "pink", trait: "mental" },
+    vitality: { color: "yellow", trait: "vitality" },
+    positive: { color: "yellow", trait: "vitality" },
+    radiant: { color: "yellow", trait: "vitality" },
+    chaotic: { color: "red", trait: "chaotic" },
+    evil: { color: "dark_purple", trait: "evil" },
+    good: { color: "yellow", trait: "good" },
+    lawful: { color: "blue", trait: "lawful" },
+    bleed: { color: "red", trait: "bleed" },
+    bleeding: { color: "red", trait: "bleed" }
 };
 
 const EXPLICIT_DATABASE_MAP = {
@@ -484,6 +512,37 @@ function resolveAssetVariants(assetType, preferredColor) {
 }
 
 // ============================================================
+// 3.3 ELEMENTAL AREA SHAPES (NEW - Phase H)
+// ============================================================
+// JB2A's "breath_weapons" family provides element-specific cone/line
+// effects that are far more distinctive than the generic burst/projectile
+// templates. Only used when the spell's area type is "cone" or "line" AND
+// a matching elemental asset is available; otherwise the existing
+// burst/projectile pipelines are used unchanged (graceful degradation).
+const ELEMENTAL_AREA_ASSETS = {
+    fire:        { cone: "jb2a.breath_weapons.fire.cone.orange.02",  line: "jb2a.breath_weapons.fire.line.orange" },
+    cold:        { cone: "jb2a.breath_weapons.cold.cone.blue" },
+    acid:        { line: "jb2a.breath_weapons.acid.line.green" },
+    electricity: { line: "jb2a.breath_weapons.lightning.line.blue" },
+    poison:      { cone: "jb2a.breath_weapons.poison.cone.green" }
+};
+
+// Resolves a validated elemental cone/line asset for the given element trait,
+// memoized in ASSET_CACHE. Returns null if no matching/valid asset exists.
+function resolveElementalAreaAsset(elementTrait, shape) {
+    if (!elementTrait || !shape) return null;
+
+    const cacheKey = `elemArea-${elementTrait}-${shape}`;
+    if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
+
+    const candidate = ELEMENTAL_AREA_ASSETS[elementTrait]?.[shape] || null;
+    const result = (candidate && isValidSequencerPath(candidate)) ? candidate : null;
+
+    ASSET_CACHE.set(cacheKey, result);
+    return result;
+}
+
+// ============================================================
 // 3.1 ENHANCED CLASSIFICATION APPLIER (NEW - Part 1.1, extended Phase B)
 // ============================================================
 // Non-breaking function that layers classification on top of base config.
@@ -668,13 +727,34 @@ function parseSpellToAnimation(spell) {
         blend: false
     };
 
-    for (const [keyword, data] of Object.entries(KEYWORD_MAP)) {
-        if (searchString.includes(keyword)) {
-            config.color = data.color;
-            if (["fire", "electricity", "sonic", "force"].includes(data.trait)) {
-                config.blend = getSettingSafe("blendModes");
-            }
+    // NEW (Phase H): Prefer the spell's structured damage/alignment traits
+    // (e.g. "fire", "mental", "vitality") over description-string matching,
+    // since traits are reliable PF2e taxonomy and description text can be
+    // misleading (e.g. flavor text mentioning an unrelated element).
+    const spellTraits = (spell.system?.traits?.value || []).map(t => String(t).toLowerCase());
+    let matchedKeyword = null;
+    for (const trait of spellTraits) {
+        if (KEYWORD_MAP[trait]) {
+            matchedKeyword = trait;
             break;
+        }
+    }
+
+    if (!matchedKeyword) {
+        for (const keyword of Object.keys(KEYWORD_MAP)) {
+            if (searchString.includes(keyword)) {
+                matchedKeyword = keyword;
+                break;
+            }
+        }
+    }
+
+    if (matchedKeyword) {
+        const data = KEYWORD_MAP[matchedKeyword];
+        config.color = data.color;
+        config.elementTrait = data.trait;
+        if (["fire", "electricity", "sonic", "force"].includes(data.trait)) {
+            config.blend = getSettingSafe("blendModes");
         }
     }
 
@@ -684,6 +764,19 @@ function parseSpellToAnimation(spell) {
         config.type = "melee";
     } else if (searchString.includes("target yourself") || searchString.includes("buff") || searchString.includes("healing")) {
         config.type = "utility";
+    }
+
+    // NEW (Phase H): For cone/line area spells, prefer an element-specific
+    // breath-weapon asset over the generic burst/projectile pipeline. Falls
+    // back to the type determined above if no matching asset is available
+    // (e.g. mental cones, which have no JB2A breath-weapon equivalent).
+    const areaShape = spell.system?.area?.type;
+    if (areaShape === "cone" || areaShape === "line") {
+        const areaEffect = resolveElementalAreaAsset(config.elementTrait, areaShape);
+        if (areaEffect) {
+            config.type = areaShape;
+            config.areaEffect = areaEffect;
+        }
     }
 
     config.castRing   = resolveAssetWithFallback("castRing", config.color);
@@ -787,7 +880,7 @@ async function executeHeuristicAnimation(spell, token) {
     // times out after 5s, and falls back to target/self positioning if no
     // template is placed (or the spell has no area).
     let areaTemplate = null;
-    if (getSettingSafe("useTemplateHandling") && animationConfig.type === "burst" && spell.system?.area?.type) {
+    if (getSettingSafe("useTemplateHandling") && ["burst", "cone", "line"].includes(animationConfig.type) && spell.system?.area?.type) {
         console.debug(`PF2e Heuristic | Awaiting template placement for "${spell.name}"...`);
         areaTemplate = await listenForTemplatePlacement(5000);
     }
@@ -878,7 +971,59 @@ async function executeHeuristicAnimation(spell, token) {
                     .fadeOut(600);
             }
         }
-    } 
+    }
+    // NEW (Phase H): Cone Pipeline - element-specific breath-weapon cone,
+    // rotated toward a placed template or the first target if available.
+    else if (animationConfig.type === "cone" && animationConfig.areaEffect) {
+        const coneTarget = areaTemplate || (targets.length > 0 ? targets[0] : null);
+
+        console.log(`%c[DEPLOYING] Cone -> .file("${animationConfig.areaEffect}")`, "color: #00ccff;");
+        let coneElement = seq.effect()
+            .file(animationConfig.areaEffect)
+            .atLocation(token);
+
+        if (coneTarget) coneElement.rotateTowards(coneTarget);
+        if (animationConfig.blend) coneElement.blendMode("ADD");
+
+        for (const target of targets) {
+            if (animationConfig.impact) {
+                console.log(`%c[DEPLOYING] Cone Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
+                let impactElement = seq.effect()
+                    .file(animationConfig.impactVariants || animationConfig.impact)
+                    .atLocation(target)
+                    .size(target.document.width * 1.5, { gridUnits: true })
+                    .delay(400);
+
+                if (animationConfig.blend) impactElement.blendMode("ADD");
+            }
+        }
+    }
+    // NEW (Phase H): Line Pipeline - element-specific breath-weapon line,
+    // stretched from the caster to a placed template or the first target.
+    else if (animationConfig.type === "line" && animationConfig.areaEffect) {
+        const lineTarget = areaTemplate || (targets.length > 0 ? targets[0] : null);
+
+        console.log(`%c[DEPLOYING] Line -> .file("${animationConfig.areaEffect}")`, "color: #00ccff;");
+        let lineElement = seq.effect()
+            .file(animationConfig.areaEffect)
+            .atLocation(token);
+
+        if (lineTarget) lineElement.stretchTo(lineTarget);
+        if (animationConfig.blend) lineElement.blendMode("ADD");
+
+        for (const target of targets) {
+            if (animationConfig.impact) {
+                console.log(`%c[DEPLOYING] Line Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
+                let impactElement = seq.effect()
+                    .file(animationConfig.impactVariants || animationConfig.impact)
+                    .atLocation(target)
+                    .size(target.document.width * 1.5, { gridUnits: true })
+                    .delay(400);
+
+                if (animationConfig.blend) impactElement.blendMode("ADD");
+            }
+        }
+    }
     // PHASE 3: Melee / Touch Pipeline (RESTORED)
     else if (animationConfig.type === "melee" && targets.length > 0) {
         for (const target of targets) {
@@ -1149,4 +1294,4 @@ globalThis._pf2eHeuristicCCHookIds.push({
     })
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes)");
