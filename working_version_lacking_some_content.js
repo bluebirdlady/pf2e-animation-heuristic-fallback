@@ -50,6 +50,9 @@
  *   at once; additional casts are skipped (not queued) once the cap is hit
  * - seq.play() is now awaited so the counter accurately reflects in-progress
  *   playback, not just sequence construction
+ *
+ * Bugfix: PHASE 5 (Token Buff route) called the non-existent Sequencer
+ * method .tieToToken(); replaced with the correct .attachTo(token).
  */
 
 // ============================================================
@@ -808,7 +811,7 @@ async function executeHeuristicAnimation(spell, token) {
                 .duration(4000)
                 .fadeIn(500)
                 .fadeOut(500)
-                .tieToToken();
+                .attachTo(token);
         }
     }
 
