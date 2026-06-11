@@ -149,8 +149,40 @@
  *     scripts/main.js                - this header + version log (loads last)
  * - working_version_lacking_some_content.js is no longer loaded by the
  *   module and is kept only as historical reference
+ *
+ * Phase K1: Predicate evaluation engine
+ * - core/predicate-engine.js adds evaluatePredicate(predicate, context),
+ *   a generic evaluator for the PF2e Graphics predicate format: arrays of
+ *   strings (implicit AND) and {not|and|or|nor|gte|lte} statements.
+ *   Unevaluable facts/shapes fail closed (treated as not matching).
+ * - buildPredicateContext(item, options) derives a { facts, values } context
+ *   from a PF2e item: item:trait:X / origin:item:trait:X, melee/ranged/
+ *   thrown, action:cost:N, jb2a:patreon/jb2a:free (via module detection), and
+ *   settings:quality / settings:persistent (new settings, see below).
+ * - New settings: "animationQualityLevel" (0-3, default 1) and
+ *   "usePersistentAnimations" (default off) back the settings:* facts.
+ * - Purely additive - not yet called from anywhere in the cast pipeline.
+ *
+ * Phase K2: Predicate-tree animation data + resolver
+ * - resources/extract_pf2e_animation_trees.py walks animations_old/spells/**
+ *   and flattens each trigger-group's predicate tree into a candidate list
+ *   per spell slug: { trigger, role, predicate, file }, where "predicate" is
+ *   the full accumulated predicate (group predicate + every ancestor
+ *   "predicate" array on the path to that file). Resolves PF2e Graphics'
+ *   alias entries (e.g. "item:slug:heal-animal" -> "item:slug:heal").
+ *   Output: data/animation-trees.js (PF2E_ANIMATION_TREES, 86 spell slugs).
+ * - resolveAnimationTreeAsset(slug, trigger, role, context) in
+ *   core/animation-tree-resolver.js filters PF2E_ANIMATION_TREES[slug] by
+ *   trigger/role, evaluates each candidate's predicate via
+ *   evaluatePredicate(), and returns the first whose predicate matches and
+ *   whose file validates via isValidSequencerPath().
+ * - Purely additive - not yet wired into parseSpellToAnimation(). This lays
+ *   the groundwork for a future phase to (a) replace the flat
+ *   PF2E_GRAPHICS_ASSET_MAP cast-time override with predicate-aware
+ *   resolution, and (b) add new non-cast triggers (attack-roll, etc.) for
+ *   weapons/class abilities/actions using the same engine.
  */
 
-// (Module bootstrap order: settings -> data/asset-maps -> core/asset-resolution -> core/spell-parser -> core/animation-executor -> core/cc-effects -> main)
+// (Module bootstrap order: settings -> data/asset-maps -> data/animation-trees -> core/asset-resolution -> core/predicate-engine -> core/animation-tree-resolver -> core/spell-parser -> core/animation-executor -> core/cc-effects -> main)
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.12.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure)");
+console.log("PF2e Heuristic Fallback Engine | Version 8.0.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure + Predicate Evaluation Engine + Predicate-Tree Animation Data)");

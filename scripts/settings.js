@@ -102,6 +102,25 @@ const registerSettings = () => {
         type: Boolean,
         default: true
     });
+    // NEW (Phase K1): Backs the "settings:quality" / "settings:persistent"
+    // predicate facts used by the predicate-tree animation resolver.
+    safeRegister("animationQualityLevel", {
+        name: "Animation Quality Level",
+        hint: "Used by predicate-driven animation selection (settings:quality) to pick higher-fidelity effects when set higher. 0 = lowest, 3 = highest.",
+        scope: "client",
+        config: true,
+        type: Number,
+        range: { min: 0, max: 3, step: 1 },
+        default: 1
+    });
+    safeRegister("usePersistentAnimations", {
+        name: "Allow Persistent Predicate-Driven Animations",
+        hint: "Used by predicate-driven animation selection (settings:persistent) to allow effects that loop/persist until manually ended.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -127,7 +146,9 @@ const getSettingSafe = (key) => {
         enableConfigCache: true,
         useTemplateHandling: false,
         enableCCEffects: false,
-        usePf2eGraphicsAssets: true
+        usePf2eGraphicsAssets: true,
+        animationQualityLevel: 1,
+        usePersistentAnimations: false
     };
     return fallbacks[key];
 };
