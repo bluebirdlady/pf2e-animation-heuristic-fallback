@@ -121,6 +121,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    // NEW (Phase K4): Gates the attack-roll/strike animation hook.
+    safeRegister("enableStrikeAnimations", {
+        name: "Enable Strike Animations (Beta)",
+        hint: "Play predicate-driven JB2A animations for weapon strikes (and a small number of attack-roll class/creature abilities) using PF2e Graphics data.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -148,7 +157,8 @@ const getSettingSafe = (key) => {
         enableCCEffects: false,
         usePf2eGraphicsAssets: true,
         animationQualityLevel: 1,
-        usePersistentAnimations: false
+        usePersistentAnimations: false,
+        enableStrikeAnimations: false
     };
     return fallbacks[key];
 };

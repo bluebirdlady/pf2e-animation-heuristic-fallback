@@ -1,6 +1,10 @@
 """
-Phase K2: Extracts predicate-tagged animation candidates from the PF2e
-Graphics module's older animation data set (animations_old/spells/**).
+Phase K2 (extended K4): Extracts predicate-tagged animation candidates from
+the PF2e Graphics module's older animation data set. Walks
+animations_old/{spells,class,creature-abilities,archetypes,feats,actions}/**
+for "item:slug:X" / "origin:item:slug:X" keys (covers spells plus the small
+number of class features/creature abilities that use attack-roll triggers,
+e.g. elemental-blast, diabolic-quill).
 
 Unlike extract_pf2e_graphics.py (Phase J), this walks each trigger-group's
 full predicate tree and emits one flat candidate per leaf "file" entry,
@@ -39,7 +43,11 @@ def main():
     result = {}
     aliases = {}  # slug -> alias target slug (e.g. "item:slug:heal-animal" -> "item:slug:heal")
 
-    for path in glob.glob("pf2e-graphics-1-alpha/animations_old/spells/**/*.json", recursive=True):
+    paths = []
+    for sub in ("spells", "class", "creature-abilities", "archetypes", "feats", "actions"):
+        paths += glob.glob(f"pf2e-graphics-1-alpha/animations_old/{sub}/**/*.json", recursive=True)
+
+    for path in paths:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
 

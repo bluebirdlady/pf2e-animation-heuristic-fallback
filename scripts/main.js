@@ -198,8 +198,38 @@
  *   use the "item:"-prefixed form exclusively.
  * - All other behavior (asset validation, variant deletion, area routing by
  *   config.type, pf2eGraphicsSlug flag) is unchanged from Phase J.
+ *
+ * Phase K4: Strike (attack-roll) animations
+ * - resources/extract_pf2e_strike_trees.py walks animations_old/weapons/**
+ *   and flattens weapon-keyed predicate trees ("item:slug:X", "item:base:X",
+ *   "item:group:X") into data/strike-animation-trees.js
+ *   (PF2E_STRIKE_TREES.bySlug/byBase/byGroup, 35/5/12 entries).
+ * - extract_pf2e_animation_trees.py (K2) now also walks animations_old/
+ *   {class,creature-abilities,archetypes,feats,actions}/** for "item:slug:X"
+ *   keys, adding a few attack-roll class/creature abilities (e.g.
+ *   elemental-blast, diabolic-quill) to PF2E_ANIMATION_TREES (90 slugs).
+ * - resolveStrikeAnimationAsset(weapon, trigger, role, context) in
+ *   core/animation-tree-resolver.js tries bySlug, then byBase, then byGroup
+ *   (most specific first), returning the first predicate-matching, validated
+ *   file.
+ * - core/strike-handler.js hooks createChatMessage for PF2e attack-roll chat
+ *   cards (context.type === "attack-roll"). It derives weapon slug/base/
+ *   group, melee-vs-ranged from the roll's own options (falling back to the
+ *   item's range/weaponType), builds a predicate context via
+ *   buildPredicateContext(item, {rangeKind, actionCost, facts: rollOptions})
+ *   - merging in the roll's own option set as facts - and resolves
+ *   projectile/impact via resolveStrikeAnimationAsset() (falling back to
+ *   resolveAnimationTreeAsset() for class/creature abilities keyed by item
+ *   slug). If neither role resolves, nothing plays (no heuristic fallback
+ *   for arbitrary weapons - scope is limited to PF2e Graphics' mined data).
+ * - executeHeuristicAnimation() now accepts an optional precomputed
+ *   animationConfig (3rd argument), used here to bypass the spell-shaped
+ *   parseSpellToAnimation() pipeline; existing callers are unaffected.
+ * - Gated behind "enableStrikeAnimations" (default off, beta). Saving-throw,
+ *   damage-taken, toggle, and place-template triggers remain future work
+ *   (K5+).
  */
 
-// (Module bootstrap order: settings -> data/asset-maps -> data/animation-trees -> core/asset-resolution -> core/predicate-engine -> core/animation-tree-resolver -> core/spell-parser -> core/animation-executor -> core/cc-effects -> main)
+// (Module bootstrap order: settings -> data/asset-maps -> data/animation-trees -> data/strike-animation-trees -> core/asset-resolution -> core/predicate-engine -> core/animation-tree-resolver -> core/spell-parser -> core/animation-executor -> core/strike-handler -> core/cc-effects -> main)
 
-console.log("PF2e Heuristic Fallback Engine | Version 8.1.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure + Predicate Evaluation Engine + Predicate-Tree Animation Data + Predicate-Tree Resolution Wired Into Cast Pipeline)");
+console.log("PF2e Heuristic Fallback Engine | Version 8.2.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure + Predicate Evaluation Engine + Predicate-Tree Animation Data + Predicate-Tree Resolution Wired Into Cast Pipeline + Strike Animations)");

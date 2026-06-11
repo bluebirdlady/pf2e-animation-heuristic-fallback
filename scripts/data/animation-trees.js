@@ -1,9 +1,11 @@
 // ============================================================
 // DATA: Predicate-tagged animation candidates mined from PF2e Graphics
-// (resources/extract_pf2e_animation_trees.py output, Phase K2). Each spell
-// slug maps to a flat list of { trigger, role, predicate, file } candidates,
-// where "predicate" is the full accumulated predicate tree (top-level group
-// predicate plus every ancestor "predicate" array) for that file. Consumed by
+// (resources/extract_pf2e_animation_trees.py output, Phase K2, extended K4
+// to also cover class features/creature abilities using "item:slug:X"
+// keys, e.g. elemental-blast, diabolic-quill). Each slug maps to a flat
+// list of { trigger, role, predicate, file } candidates, where "predicate"
+// is the full accumulated predicate tree (top-level group predicate plus
+// every ancestor "predicate" array) for that file. Consumed by
 // resolveAnimationTreeAsset() in core/animation-tree-resolver.js, which
 // evaluates each candidate's predicate via evaluatePredicate() against a
 // runtime context before checking isValidSequencerPath().
@@ -1442,6 +1444,319 @@ const PF2E_ANIMATION_TREES = {
             "file": "jb2a.template_circle.out_pulse.02.burst.bluewhite"
         }
     ],
+    "elemental-blast": [
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:air",
+                "item:trait:electricity",
+                "ranged"
+            ],
+            "file": "jb2a.chain_lightning.primary.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                "item:trait:electricity",
+                "ranged",
+                "action:cost:2"
+            ],
+            "file": "jb2a.static_electricity.03.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                "item:trait:electricity",
+                "melee"
+            ],
+            "file": "jb2a.unarmed_strike.magical.01.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:air",
+                "item:trait:electricity",
+                "melee"
+            ],
+            "file": "jb2a.chain_lightning.secondary.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                "item:trait:electricity",
+                "melee",
+                "action:cost:2"
+            ],
+            "file": "jb2a.static_electricity.03.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:air",
+                {
+                    "not": "item:trait:electricity"
+                },
+                "ranged",
+                "jb2a:patreon"
+            ],
+            "file": "jb2a.spell_projectile.earth.01.browngreen"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:air",
+                {
+                    "not": "item:trait:electricity"
+                },
+                "ranged",
+                "jb2a:free"
+            ],
+            "file": "jb2a.gust_of_wind.veryfast"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                {
+                    "not": "item:trait:electricity"
+                },
+                "ranged",
+                "action:cost:2"
+            ],
+            "file": "jb2a.template_circle.aura.01.complete.small.bluepurple"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                {
+                    "not": "item:trait:electricity"
+                },
+                "melee"
+            ],
+            "file": "jb2a.melee_generic.whirlwind.01.orange.1"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:air",
+                {
+                    "not": "item:trait:electricity"
+                },
+                "melee",
+                "action:cost:2"
+            ],
+            "file": "jb2a.melee_generic.whirlwind.01.orange.0"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:earth"
+            ],
+            "file": "jb2a.boulder.toss.02.01.stone.brown"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:earth",
+                "action:cost:2",
+                "jb2a:patreon"
+            ],
+            "file": "jb2a.impact.earth.01.browngreen.0"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:earth",
+                "action:cost:2",
+                "jb2a:free"
+            ],
+            "file": "jb2a.scorched_earth.black"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:fire"
+            ],
+            "file": "jb2a.fire_bolt.orange"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:fire",
+                "action:cost:2"
+            ],
+            "file": "jb2a.impact.fire.01.orange.0"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:metal",
+                "jb2a:free"
+            ],
+            "file": "jb2a.dagger.throw.01.white"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:metal",
+                "jb2a:patreon"
+            ],
+            "file": "jb2a.dart.01.throw.physical.white"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:metal",
+                "action:cost:2"
+            ],
+            "file": "jb2a.impact.003.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:water",
+                "item:trait:cold"
+            ],
+            "file": "jb2a.spell_projectile.ice_shard.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:water",
+                "item:trait:cold",
+                "action:cost:2"
+            ],
+            "file": "jb2a.ice_spikes.radial.burst.white"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:water",
+                {
+                    "not": "item:trait:cold"
+                },
+                "jb2a:patreon"
+            ],
+            "file": "jb2a.ranged.04.projectile.01.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:water",
+                {
+                    "not": "item:trait:cold"
+                },
+                "jb2a:free"
+            ],
+            "file": "jb2a.ranged.04.projectile.01.green"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:water",
+                {
+                    "not": "item:trait:cold"
+                },
+                "action:cost:2"
+            ],
+            "file": "jb2a.impact.water.02.blue"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:wood",
+                {
+                    "not": "item:trait:vitality"
+                }
+            ],
+            "file": "jb2a.barrel.toss.wooden.01.01.brown"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:wood",
+                {
+                    "not": "item:trait:vitality"
+                },
+                "action:cost:2"
+            ],
+            "file": "jb2a.explosion.shrapnel.bomb.01.black"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "projectile",
+            "predicate": [
+                "item:trait:wood",
+                "item:trait:vitality"
+            ],
+            "file": "jb2a.ranged.03.instant.01.bluegreen"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "item:trait:wood",
+                "item:trait:vitality",
+                "action:cost:2"
+            ],
+            "file": "jb2a.energy_strands.in.green.01"
+        }
+    ],
+    "flying-flame": [
+        {
+            "trigger": "damage-roll",
+            "role": "projectile",
+            "predicate": [],
+            "file": "jb2a.pack_hound_missile.blue.01"
+        }
+    ],
+    "diabolic-quill": [
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "jb2a:patreon"
+            ],
+            "file": "jb2a.template_line_piercing.void.01.purple"
+        },
+        {
+            "trigger": "attack-roll",
+            "role": "impact",
+            "predicate": [
+                "jb2a:free"
+            ],
+            "file": "jb2a.template_line_piercing.generic.01.orange"
+        }
+    ],
     "faerie-dust": [
         {
             "trigger": "place-template",
@@ -1614,6 +1929,49 @@ const PF2E_ANIMATION_TREES = {
             "role": "projectile",
             "predicate": [],
             "file": "jb2a.chain_lightning.primary.blue"
+        }
+    ],
+    "blazing-wave": [
+        {
+            "trigger": "place-template",
+            "role": "areaEffect",
+            "predicate": [],
+            "file": "jb2a.burning_hands.01.orange"
+        },
+        {
+            "trigger": "place-template",
+            "role": "areaEffect",
+            "predicate": [
+                {
+                    "gte": [
+                        "settings:quality",
+                        2
+                    ]
+                }
+            ],
+            "file": "jb2a.burning_hands.01.orange"
+        },
+        {
+            "trigger": "place-template",
+            "role": "areaEffect",
+            "predicate": [
+                "conservation-of-energy:cold"
+            ],
+            "file": "jb2a.cone_of_cold.blue"
+        },
+        {
+            "trigger": "place-template",
+            "role": "areaEffect",
+            "predicate": [
+                "conservation-of-energy:cold",
+                {
+                    "gte": [
+                        "settings:quality",
+                        2
+                    ]
+                }
+            ],
+            "file": "jb2a.cone_of_cold.blue"
         }
     ]
 };

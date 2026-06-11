@@ -10,13 +10,17 @@ let activeSequences = 0;
 // ============================================================
 // 5. RENDERING PIPELINE WITH VERIFICATION LOGGING
 // ============================================================
-async function executeHeuristicAnimation(spell, token) {
+// NEW (Phase K4): Accepts an optional pre-built animationConfig, used by
+// core/strike-handler.js to bypass parseSpellToAnimation() (which is
+// spell-shaped) for weapon-strike configs resolved via
+// resolveStrikeAnimationAsset(). When omitted, behavior is unchanged.
+async function executeHeuristicAnimation(spell, token, precomputedConfig = null) {
     if (!token || !canvas.tokens?.placeables.includes(token)) return;
 
     const SequenceClass = typeof Sequence !== 'undefined' ? Sequence : game.modules.get("sequencer")?.api?.Sequence;
     if (!SequenceClass) return;
 
-    const animationConfig = parseSpellToAnimation(spell);
+    const animationConfig = precomputedConfig || parseSpellToAnimation(spell);
 
     // NEW (Phase A): Step aside for spells with a curated macro
     if (animationConfig.type === "CURATED_SPELL") {
