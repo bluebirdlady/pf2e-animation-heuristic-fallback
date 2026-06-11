@@ -59,7 +59,7 @@
     console.log("%c--- 2. New element table coverage ---", "color:#9900ff;font-weight:bold;");
 
     const newElements = [
-        { trait: "mental", expectedColor: "pink" },
+        { trait: "mental", expectedColor: "pinkpurple" },
         { trait: "vitality", expectedColor: "yellow" },
         { trait: "chaotic", expectedColor: "red" },
         { trait: "lawful", expectedColor: "blue" },

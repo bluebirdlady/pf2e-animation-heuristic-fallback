@@ -272,8 +272,8 @@ const KEYWORD_MAP = {
     poison: { color: "green", trait: "poison" },
     toxic: { color: "green", trait: "poison" },
     // NEW (Phase H): Additional PF2e damage/alignment trait coverage
-    mental: { color: "pink", trait: "mental" },
-    psychic: { color: "pink", trait: "mental" },
+    mental: { color: "pinkpurple", trait: "mental" },
+    psychic: { color: "pinkpurple", trait: "mental" },
     vitality: { color: "yellow", trait: "vitality" },
     positive: { color: "yellow", trait: "vitality" },
     radiant: { color: "yellow", trait: "vitality" },
