@@ -77,16 +77,27 @@ function buildPredicateContext(item, options = {}) {
     const originTraits = (options.origin?.system?.traits?.value || []).map(t => String(t).toLowerCase());
     for (const trait of originTraits) facts.add(`origin:item:trait:${trait}`);
 
-    if (traits.includes("thrown")) facts.add("thrown");
+    if (traits.includes("thrown")) {
+        facts.add("thrown");
+        facts.add("item:thrown");
+    }
 
     // melee/ranged: prefer an explicit override (e.g. which usage of a
     // thrown weapon triggered this), then fall back to the item's range.
+    // Some older PF2e Graphics entries use "item:ranged"/"item:melee"
+    // instead of the more common "ranged"/"melee" - set both forms so
+    // either predicate style matches.
+    let rangeKind = null;
     if (options.rangeKind === "melee" || options.rangeKind === "ranged") {
-        facts.add(options.rangeKind);
+        rangeKind = options.rangeKind;
     } else if (item?.system?.range?.value) {
-        facts.add("ranged");
-    } else if (item?.type === "weapon" || item?.type === "melee" || item?.type === "action") {
-        facts.add("melee");
+        rangeKind = "ranged";
+    } else if (item?.type === "weapon" || item?.type === "melee" || item?.type === "action" || item?.type === "spell") {
+        rangeKind = "melee";
+    }
+    if (rangeKind) {
+        facts.add(rangeKind);
+        facts.add(`item:${rangeKind}`);
     }
 
     const actionCost = options.actionCost ?? item?.system?.actions?.value;

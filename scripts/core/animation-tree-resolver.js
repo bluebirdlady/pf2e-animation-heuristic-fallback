@@ -7,11 +7,11 @@
 // data/animation-trees.js, core/predicate-engine.js and
 // core/asset-resolution.js.
 //
-// This is additive: it is not yet wired into parseSpellToAnimation() (that
-// integration, plus new non-cast triggers like "attack-roll" for weapons/
-// class abilities, is future work). For now it can be exercised directly,
-// e.g. from the console, to validate predicate-driven resolution against the
-// existing PF2E_GRAPHICS_ASSET_MAP results.
+// As of Phase K3, this is the primary resolver used by
+// parseSpellToAnimation()'s PF2e Graphics override block (with
+// PF2E_GRAPHICS_ASSET_MAP as a fallback for slugs/roles the predicate tree
+// doesn't resolve). New non-cast triggers (e.g. "attack-roll" for weapons/
+// class abilities) remain future work.
 // ============================================================
 
 // Returns the first valid JB2A path for (slug, trigger, role) whose

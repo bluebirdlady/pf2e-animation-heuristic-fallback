@@ -181,8 +181,25 @@
  *   PF2E_GRAPHICS_ASSET_MAP cast-time override with predicate-aware
  *   resolution, and (b) add new non-cast triggers (attack-roll, etc.) for
  *   weapons/class abilities/actions using the same engine.
+ *
+ * Phase K3: Predicate-tree resolution wired into the cast pipeline
+ * - parseSpellToAnimation()'s PF2e Graphics override block now builds a
+ *   predicate context per spell via buildPredicateContext(spell, { rangeKind:
+ *   config.type === "melee" ? "melee" : "ranged" }) and tries
+ *   resolveAnimationTreeAsset(slug, "attack-roll", role, context) for each of
+ *   projectile/impact/areaEffect, falling back to the flat
+ *   PF2E_GRAPHICS_ASSET_MAP (Phase J) only if the tree returns null for that
+ *   role. The override block now activates for any slug present in either
+ *   PF2E_ANIMATION_TREES (86 slugs) or PF2E_GRAPHICS_ASSET_MAP (76 slugs,
+ *   strict subset of the former).
+ * - buildPredicateContext() now sets both naming conventions found in PF2e
+ *   Graphics source data for melee/ranged/thrown facts ("ranged" and
+ *   "item:ranged", etc.), since a small number of entries (e.g. "ignition")
+ *   use the "item:"-prefixed form exclusively.
+ * - All other behavior (asset validation, variant deletion, area routing by
+ *   config.type, pf2eGraphicsSlug flag) is unchanged from Phase J.
  */
 
 // (Module bootstrap order: settings -> data/asset-maps -> data/animation-trees -> core/asset-resolution -> core/predicate-engine -> core/animation-tree-resolver -> core/spell-parser -> core/animation-executor -> core/cc-effects -> main)
 
-console.log("PF2e Heuristic Fallback Engine | Version 8.0.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure + Predicate Evaluation Engine + Predicate-Tree Animation Data)");
+console.log("PF2e Heuristic Fallback Engine | Version 8.1.0 (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import + Modular File Structure + Predicate Evaluation Engine + Predicate-Tree Animation Data + Predicate-Tree Resolution Wired Into Cast Pipeline)");

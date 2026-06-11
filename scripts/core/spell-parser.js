@@ -1,6 +1,7 @@
 // ============================================================
 // CORE: Spell classification and config parsing. Depends on
-// data/asset-maps.js and core/asset-resolution.js.
+// data/asset-maps.js, core/asset-resolution.js, core/predicate-engine.js,
+// data/animation-trees.js, and core/animation-tree-resolver.js.
 // ============================================================
 
 // NEW (Phase E): Caches parseSpellToAnimation() results per spell so the same
@@ -284,25 +285,36 @@ function parseSpellToAnimation(spell) {
         }
     }
 
-    // NEW (Phase J): Apply hand-curated PF2e Graphics asset overrides, if
-    // available and enabled. Only overrides slots with a valid mapped asset;
-    // everything else keeps its heuristic-derived value.
+    // NEW (Phase J, extended Phase K3): Apply hand-curated PF2e Graphics
+    // asset overrides, if available and enabled. Only overrides slots with a
+    // valid resolved asset; everything else keeps its heuristic-derived
+    // value.
     if (getSettingSafe("usePf2eGraphicsAssets")) {
         const pgSlug = getSpellSlug(spell);
-        if (pgSlug && PF2E_GRAPHICS_ASSET_MAP[pgSlug]) {
-            const pgProjectile = resolvePf2eGraphicsAsset(pgSlug, "projectile");
+        if (pgSlug && (PF2E_ANIMATION_TREES[pgSlug] || PF2E_GRAPHICS_ASSET_MAP[pgSlug])) {
+            // NEW (Phase K3): Predicate-tree resolution first (item traits,
+            // melee/ranged, asset availability, settings), falling back to
+            // the flat Phase J map for slugs/roles the tree doesn't cover.
+            const treeContext = buildPredicateContext(spell, {
+                rangeKind: config.type === "melee" ? "melee" : "ranged"
+            });
+            const resolveRole = (role) =>
+                resolveAnimationTreeAsset(pgSlug, "attack-roll", role, treeContext)
+                || resolvePf2eGraphicsAsset(pgSlug, role);
+
+            const pgProjectile = resolveRole("projectile");
             if (pgProjectile) {
                 config.projectile = pgProjectile;
                 delete config.projectileVariants;
             }
 
-            const pgImpact = resolvePf2eGraphicsAsset(pgSlug, "impact");
+            const pgImpact = resolveRole("impact");
             if (pgImpact) {
                 config.impact = pgImpact;
                 delete config.impactVariants;
             }
 
-            const pgArea = resolvePf2eGraphicsAsset(pgSlug, "areaEffect");
+            const pgArea = resolveRole("areaEffect");
             if (pgArea) {
                 if (config.type === "cone" || config.type === "line") {
                     config.areaEffect = pgArea;
