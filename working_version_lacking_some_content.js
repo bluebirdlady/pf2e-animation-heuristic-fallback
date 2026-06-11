@@ -103,6 +103,21 @@
  * - If no elemental area asset matches (e.g. mental, force), the spell falls
  *   back to its previously-determined type (burst/projectile/etc) -
  *   completely unchanged behavior for those spells
+ *
+ * Phase I: Structured burst detection + ring color diversity
+ * - parseSpellToAnimation() now checks spell.system.area.type first for
+ *   "burst"/"emanation"/"cube"/"square"/"circle" shapes and classifies the
+ *   spell as type "burst" if matched, before falling back to the existing
+ *   description-string search (fixes spells like emanation auras whose
+ *   descriptions never say "burst"/"emanation"/etc.)
+ * - Cast/ground rings previously only resolved to
+ *   jb2a.magic_signs.circle.01.abjuration.{blue,green,red} and fell back to
+ *   blue for every other element color. EXPLICIT_DATABASE_MAP.castRing/
+ *   groundRing now try jb2a.magic_signs.circle.02.abjuration.complete.{color}
+ *   first (12-color family), and RING_COLOR_ALIASES maps KEYWORD_MAP colors
+ *   outside that family (orange, blueyellow, holy, pinkpurple, bluegreen,
+ *   gold) to their nearest equivalent - only used for castRing/groundRing
+ *   resolution, impact/projectile/tokenBuff colors are unchanged
  */
 
 // ============================================================
@@ -285,12 +300,30 @@ const KEYWORD_MAP = {
     bleeding: { color: "red", trait: "bleed" }
 };
 
+// NEW (Phase I): jb2a.magic_signs.circle.02.{school}.{stage}.{color} only
+// covers a 12-color set (blue, dark_blue, dark_green, dark_pink, dark_purple,
+// dark_red, dark_yellow, green, pink, purple, red, yellow). Several KEYWORD_MAP
+// colors fall outside that set, so cast/ground rings would otherwise fall
+// back to a generic blue ring for those elements. This table maps those
+// out-of-set colors to their nearest equivalent within the 12-color family,
+// and is consulted only when resolving castRing/groundRing.
+const RING_COLOR_ALIASES = {
+    orange: "dark_yellow",
+    blueyellow: "yellow",
+    holy: "yellow",
+    pinkpurple: "pink",
+    bluegreen: "green",
+    gold: "yellow"
+};
+
 const EXPLICIT_DATABASE_MAP = {
     castRing: [
+        "jb2a.magic_signs.circle.02.abjuration.complete.{color}",
         "jb2a.magic_signs.circle.01.abjuration.{color}",
         "jb2a.magic_signs.circle.01.abjuration.blue"
     ],
     groundRing: [
+        "jb2a.magic_signs.circle.02.abjuration.complete.{color}",
         "jb2a.magic_signs.circle.01.abjuration.{color}",
         "jb2a.magic_signs.circle.01.abjuration.blue"
     ],
@@ -758,7 +791,16 @@ function parseSpellToAnimation(spell) {
         }
     }
 
-    if (searchString.includes("burst") || searchString.includes("emanation") || searchString.includes("radius") || searchString.includes("splash")) {
+    const areaShape = spell.system?.area?.type;
+
+    // NEW (Phase I): Prefer the spell's structured area.type (burst,
+    // emanation, cube, square, circle) over description-string matching for
+    // burst classification - some spells (e.g. emanation auras) never use
+    // the words "burst"/"emanation"/etc. in their description text.
+    const burstAreaShapes = ["burst", "emanation", "cube", "square", "circle"];
+    if (burstAreaShapes.includes(areaShape)) {
+        config.type = "burst";
+    } else if (searchString.includes("burst") || searchString.includes("emanation") || searchString.includes("radius") || searchString.includes("splash")) {
         config.type = "burst";
     } else if (searchString.includes("touch") || searchString.includes("melee strike")) {
         config.type = "melee";
@@ -770,7 +812,6 @@ function parseSpellToAnimation(spell) {
     // breath-weapon asset over the generic burst/projectile pipeline. Falls
     // back to the type determined above if no matching asset is available
     // (e.g. mental cones, which have no JB2A breath-weapon equivalent).
-    const areaShape = spell.system?.area?.type;
     if (areaShape === "cone" || areaShape === "line") {
         const areaEffect = resolveElementalAreaAsset(config.elementTrait, areaShape);
         if (areaEffect) {
@@ -779,8 +820,13 @@ function parseSpellToAnimation(spell) {
         }
     }
 
-    config.castRing   = resolveAssetWithFallback("castRing", config.color);
-    config.groundRing = resolveAssetWithFallback("groundRing", config.color);
+    // NEW (Phase I): Ring assets use a separate color alias so elements whose
+    // KEYWORD_MAP color falls outside the circle.02 12-color family (e.g.
+    // "orange", "pinkpurple") still get a non-blue ring instead of falling
+    // back to the generic blue circle.01 entry.
+    const ringColor = RING_COLOR_ALIASES[config.color] || config.color;
+    config.castRing   = resolveAssetWithFallback("castRing", ringColor);
+    config.groundRing = resolveAssetWithFallback("groundRing", ringColor);
     config.impact     = resolveAssetWithFallback("impact", config.color);
     config.projectile = resolveAssetWithFallback("projectile", config.color);
     config.tokenBuff  = resolveAssetWithFallback("tokenBuff", config.color);
@@ -790,7 +836,8 @@ function parseSpellToAnimation(spell) {
     // single resolved path above otherwise.
     if (getSettingSafe("randomVariants")) {
         for (const assetType of ["castRing", "groundRing", "impact", "projectile", "tokenBuff"]) {
-            const variants = resolveAssetVariants(assetType, config.color);
+            const variantColor = (assetType === "castRing" || assetType === "groundRing") ? ringColor : config.color;
+            const variants = resolveAssetVariants(assetType, variantColor);
             if (variants.length > 1) {
                 config[`${assetType}Variants`] = variants;
             }
@@ -1294,4 +1341,4 @@ globalThis._pf2eHeuristicCCHookIds.push({
     })
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity)");
