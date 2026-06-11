@@ -1,0 +1,133 @@
+// ============================================================
+// SETTINGS: Module setting registration and getSettingSafe() accessor.
+// Loaded first - no dependencies on other module files.
+// ============================================================
+// 1. MODULE SETTINGS INITIALIZATION
+// ============================================================
+const registerSettings = () => {
+    const safeRegister = (key, data) => {
+        try {
+            game.settings.register("pf2e-heuristic-fallback", key, data);
+        } catch (e) {
+            console.debug(`PF2e Heuristic | Key "${key}" already initialized.`);
+        }
+    };
+
+    safeRegister("enable", {
+        name: "Enable Heuristic Fallback Animations",
+        hint: "Automatically plays best-guess visual effects for spells missing explicit macros.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+    safeRegister("lingeringEffects", {
+        name: "Enable Lingering Elemental Effects",
+        hint: "After a projectile hits, add a short-lived ground sign effect.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+    safeRegister("blendModes", {
+        name: "Use ADD Blend Mode for Energy Spells",
+        hint: "Applies additive blending to projectiles and impacts for fire, lightning, etc.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+    safeRegister("advancedClassification", {
+        name: "Enable Advanced Spell Classification (Experimental)",
+        hint: "Layer richer spell analysis (traditions, schools) on top of keyword matching. Non-breaking.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
+    safeRegister("skipCuratedSpells", {
+        name: "Defer to Curated Animation Macros",
+        hint: "If a spell has a hand-crafted macro in the PF2e Animation Macros (JB2A) module, skip the heuristic animation for it.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+    safeRegister("randomVariants", {
+        name: "Use Random Animation Variants",
+        hint: "When multiple matching JB2A animations exist for a spell's color/type, randomly pick among them for visual variety.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
+    safeRegister("maxConcurrentAnimations", {
+        name: "Max Concurrent Animations",
+        hint: "Limit how many heuristic animation sequences can play at once. Additional casts are skipped (not queued) until one finishes.",
+        scope: "client",
+        config: true,
+        type: Number,
+        range: { min: 1, max: 16, step: 1 },
+        default: 4
+    });
+    safeRegister("enableConfigCache", {
+        name: "Enable Configuration Cache",
+        hint: "Cache spell parsing results for performance (disable if you encounter stale data).",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+    safeRegister("useTemplateHandling", {
+        name: "Enable Template Placement Handling",
+        hint: "For area spells (burst/cone/line/emanation), briefly wait for you to place a measurement template and center the animation on it.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
+    safeRegister("enableCCEffects", {
+        name: "Enable Persistent Crowd-Control Effects (Beta)",
+        hint: "Show a looping overlay effect on tokens afflicted with restraint conditions (immobilized, restrained, paralyzed, grabbed), removed automatically when the condition ends.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: false
+    });
+    safeRegister("usePf2eGraphicsAssets", {
+        name: "Use PF2e Graphics Asset Overrides",
+        hint: "For spells with a hand-curated mapping mined from the PF2e Graphics module, use those JB2A assets instead of the heuristic-derived ones.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
+};
+
+if (game.ready || game.canvas?.ready) {
+    registerSettings();
+} else {
+    Hooks.once("init", registerSettings);
+}
+
+const getSettingSafe = (key) => {
+    try {
+        if (game.settings.settings.has(`pf2e-heuristic-fallback.${key}`)) {
+            return game.settings.get("pf2e-heuristic-fallback", key);
+        }
+    } catch(e) {}
+    const fallbacks = {
+        enable: true,
+        lingeringEffects: true,
+        blendModes: true,
+        advancedClassification: false,
+        skipCuratedSpells: true,
+        randomVariants: false,
+        maxConcurrentAnimations: 4,
+        enableConfigCache: true,
+        useTemplateHandling: false,
+        enableCCEffects: false,
+        usePf2eGraphicsAssets: true
+    };
+    return fallbacks[key];
+};
