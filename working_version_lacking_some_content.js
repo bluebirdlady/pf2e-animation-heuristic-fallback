@@ -118,6 +118,22 @@
  *   outside that family (orange, blueyellow, holy, pinkpurple, bluegreen,
  *   gold) to their nearest equivalent - only used for castRing/groundRing
  *   resolution, impact/projectile/tokenBuff colors are unchanged
+ *
+ * Phase J: PF2e Graphics asset import
+ * - PF2E_GRAPHICS_ASSET_MAP (resources/extract_pf2e_graphics.py output) maps
+ *   spell slugs to hand-curated JB2A asset candidates by role (projectile,
+ *   impact, areaEffect), mined from the now-unmaintained PF2e Graphics
+ *   module's older animation data set (76 spells)
+ * - parseSpellToAnimation() applies these as overrides on top of the
+ *   heuristic-derived config: projectile/impact replace the heuristic asset
+ *   directly; areaEffect replaces the cone/line areaEffect or, for "burst"
+ *   spells, the groundRing
+ * - Each candidate is validated via isValidSequencerPath() and the first
+ *   valid one wins; if none validate, the heuristic-derived asset is kept
+ *   unchanged
+ * - Gated behind "usePf2eGraphicsAssets" (default on)
+ * - reportPf2eGraphicsCoverage() (console-only) scans all spell compendiums
+ *   and logs what fraction of spells have a mapped entry, for gap-tracking
  */
 
 // ============================================================
@@ -213,6 +229,14 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    safeRegister("usePf2eGraphicsAssets", {
+        name: "Use PF2e Graphics Asset Overrides",
+        hint: "For spells with a hand-curated mapping mined from the PF2e Graphics module, use those JB2A assets instead of the heuristic-derived ones.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -237,10 +261,19 @@ const getSettingSafe = (key) => {
         maxConcurrentAnimations: 4,
         enableConfigCache: true,
         useTemplateHandling: false,
-        enableCCEffects: false
+        enableCCEffects: false,
+        usePf2eGraphicsAssets: true
     };
     return fallbacks[key];
 };
+
+// NEW (Phase J): Shared slug derivation, used by both the curated-spell check
+// and the PF2e Graphics asset map lookup.
+function getSpellSlug(spell) {
+    return spell.slug || (typeof spell.name?.slugify === "function"
+        ? spell.name.slugify({ strict: true })
+        : (spell.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
+}
 
 // ============================================================
 // 2. CORE CONFIGURATION & DICTIONARIES
@@ -352,6 +385,547 @@ const EXPLICIT_DATABASE_MAP = {
         "jb2a.shimmer.01.blue"
     ]
 };
+
+// ============================================================
+// 2.0.1 PF2E GRAPHICS ASSET MAP (NEW - Phase J)
+// ============================================================
+// Mined from the (now-unmaintained) PF2e Graphics module's older animation
+// data set via resources/extract_pf2e_graphics.py. Maps spell slugs to
+// hand-curated JB2A asset candidates by role:
+//   - projectile: cast-to-target ranged effect (preset "ranged")
+//   - impact:     effect on the target (preset "onToken"/"melee")
+//   - areaEffect: template-centered effect (preset "template")
+// resolvePf2eGraphicsAsset() validates each candidate in order via
+// isValidSequencerPath() and returns the first that resolves, or null if
+// none do (in which case the heuristic-derived asset is kept).
+const PF2E_GRAPHICS_ASSET_MAP = {
+    "acid-splash": {
+        "projectile": [
+            "jb2a.fire_bolt.green"
+        ],
+        "impact": [
+            "jb2a.liquid.splash.green"
+        ]
+    },
+    "admonishing-ray": {
+        "projectile": [
+            "jb2a.ranged.02.instant.01.yellow",
+            "jb2a.ranged.02.instant.01.purple"
+        ]
+    },
+    "alarm": {
+        "areaEffect": [
+            "jb2a.magic_signs.circle.02.abjuration.intro.blue",
+            "jb2a.magic_signs.circle.02.abjuration.complete.blue"
+        ]
+    },
+    "breathe-fire": {
+        "areaEffect": [
+            "jb2a.burning_hands.01.orange",
+            "jb2a.cone_of_cold.blue"
+        ]
+    },
+    "briny-bolt": {
+        "projectile": [
+            "jb2a.ranged.04.projectile.01.green",
+            "jb2a.ranged.04.projectile.01.blue"
+        ]
+    },
+    "caustic-blast": {
+        "projectile": [
+            "jb2a.fire_bolt.green"
+        ],
+        "areaEffect": [
+            "jb2a.liquid.splash.green"
+        ]
+    },
+    "charm": {
+        "impact": [
+            "jb2a.whirlwind.purple"
+        ]
+    },
+    "chilling-spray": {
+        "areaEffect": [
+            "jb2a.cone_of_cold.blue"
+        ]
+    },
+    "command": {
+        "impact": [
+            "jb2a.template_circle.out_pulse.02.burst"
+        ]
+    },
+    "crushing-ground": {
+        "impact": [
+            "jb2a.impact.ground_crack.02.orange"
+        ]
+    },
+    "daze": {
+        "projectile": [
+            "jb2a.fire_bolt.orange",
+            "jb2a.fire_bolt.purple"
+        ]
+    },
+    "detect-magic": {
+        "areaEffect": [
+            "jb2a.detect_magic.circle"
+        ]
+    },
+    "divine-lance": {
+        "projectile": [
+            "jb2a.ranged.02.instant.01.yellow",
+            "jb2a.ranged.01.instant.01.dark_orange",
+            "jb2a.ranged.01.instant.01.dark_purple"
+        ]
+    },
+    "dizzying-colors": {
+        "areaEffect": [
+            "jb2a.breath_weapons.cold.cone.blue",
+            "jb2a.breath_weapons.cold.cone.green",
+            "jb2a.breath_weapons.cold.cone.orange",
+            "jb2a.breath_weapons.cold.cone.purple"
+        ]
+    },
+    "electric-arc": {
+        "projectile": [
+            "jb2a.chain_lightning.primary.blue"
+        ]
+    },
+    "enfeeble": {
+        "projectile": [
+            "jb2a.eldritch_blast.dark_red"
+        ]
+    },
+    "force-barrage": {
+        "projectile": [
+            "jb2a.magic_missile.purple"
+        ]
+    },
+    "frostbite": {
+        "projectile": [
+            "jb2a.ray_of_frost.blue"
+        ]
+    },
+    "gale-blast": {
+        "areaEffect": [
+            "jb2a.whirlwind.bluegrey"
+        ]
+    },
+    "gouging-claw": {
+        "impact": [
+            "jb2a.melee_generic.piercing.one_handed",
+            "jb2a.melee_generic.slashing.one_handed"
+        ]
+    },
+    "grim-tendrils": {
+        "areaEffect": [
+            "jb2a.energy_strands.range.multiple.purple.01"
+        ]
+    },
+    "haunting-hymn": {
+        "areaEffect": [
+            "jb2a.side_impact.part.shockwave.blue",
+            "jb2a.side_impact.part.slow.music_note.pink"
+        ]
+    },
+    "heal": {
+        "projectile": [
+            "jb2a.bullet.01.green"
+        ],
+        "impact": [
+            "jb2a.healing_generic.400px.green"
+        ]
+    },
+    "ignition": {
+        "impact": [
+            "jb2a.cast_generic.fire.side01.orange.0",
+            "jb2a.impact.fire.01.orange.0",
+            "jb2a.side_impact.ice_shard.blue",
+            "jb2a.unarmed_strike.magical.{01,02}.orange",
+            "jb2a.unarmed_strike.magical.{01,02}.blue"
+        ],
+        "projectile": [
+            "jb2a.fire_bolt.orange",
+            "jb2a.spell_projectile.ice_shard.blue"
+        ]
+    },
+    "imaginary-weapon": {
+        "impact": [
+            "jb2a.melee_attack.02.trail.01.blueyellow"
+        ]
+    },
+    "kinetic-ram": {
+        "impact": [
+            "jb2a.melee_generic.bludgeoning.two_handed"
+        ],
+        "areaEffect": [
+            "jb2a.explosion.04.dark_purple"
+        ]
+    },
+    "lay-on-hands": {
+        "impact": [
+            "jb2a.cure_wounds.400px.blue"
+        ]
+    },
+    "lose-the-path": {
+        "impact": [
+            "jb2a.magic_signs.rune.illusion.complete.purple",
+            "jb2a.magic_signs.rune.illusion.complete.green"
+        ]
+    },
+    "mushroom-patch": {
+        "areaEffect": [
+            "jb2a.plant_growth.03.round.4x4.complete.greenyellow"
+        ]
+    },
+    "needle-darts": {
+        "projectile": [
+            "jb2a.bolt.physical.orange",
+            "jb2a.bolt.physical.white"
+        ]
+    },
+    "phase-bolt": {
+        "projectile": [
+            "jb2a.bolt.physical.orange",
+            "jb2a.bolt.physical.purple"
+        ]
+    },
+    "puff-of-poison": {
+        "projectile": [
+            "jb2a.smoke.puff.side.green",
+            "jb2a.smoke.puff.side.grey"
+        ]
+    },
+    "ray-of-frost": {
+        "projectile": [
+            "jb2a.ray_of_frost.blue"
+        ]
+    },
+    "scatter-scree": {
+        "areaEffect": [
+            "jb2a.falling_rocks.side.2x1.grey"
+        ]
+    },
+    "schadenfreude": {
+        "impact": [
+            "jb2a.icon.stun.purple"
+        ]
+    },
+    "soothe": {
+        "projectile": [
+            "jb2a.energy_strands.range.standard.dark_green"
+        ],
+        "impact": [
+            "jb2a.healing_generic.400px.green"
+        ]
+    },
+    "spout": {
+        "areaEffect": [
+            "jb2a.water_splash.circle.01.blue"
+        ]
+    },
+    "telekinetic-projectile": {
+        "projectile": [
+            "jb2a.boulder.toss.02.01.stone.brown",
+            "jb2a.slingshot",
+            "jb2a.dart.01.throw.physical.white"
+        ],
+        "impact": [
+            "jb2a.template_line_piercing.generic.01.orange",
+            "jb2a.melee_generic.slash.01.orange",
+            "jb2a.melee_generic.slashing"
+        ]
+    },
+    "telekinetic-rend": {
+        "areaEffect": [
+            "jb2a.falling_rocks.top.1x1.grey",
+            "jb2a.whirlwind.bluegrey"
+        ]
+    },
+    "tempest-surge": {
+        "impact": [
+            "jb2a.lightning_orb.01.loop.bluepurple.0"
+        ]
+    },
+    "vitality-lash": {
+        "projectile": [
+            "jb2a.energy_strands.range.standard.purple.04",
+            "jb2a.energy_strands.range.standard.dark_green.04"
+        ]
+    },
+    "void-warp": {
+        "projectile": [
+            "jb2a.energy_strands.range.standard.purple"
+        ]
+    },
+    "wildfire": {
+        "areaEffect": [
+            "jb2a.ground_cracks.orange.02"
+        ]
+    },
+    "blazing-bolt": {
+        "projectile": [
+            "jb2a.scorching_ray.01.orange"
+        ]
+    },
+    "darkness": {
+        "areaEffect": [
+            "jb2a.darkness.black"
+        ]
+    },
+    "grease": {
+        "impact": [
+            "jb2a.grease.dark_brown.loop"
+        ]
+    },
+    "harmonize-self": {
+        "impact": [
+            "jb2a.energy_strands.in.green.01.2"
+        ]
+    },
+    "heat-metal": {
+        "impact": [
+            "jb2a.flames.orange.03.2x2",
+            "jb2a.ice_spikes.radial.burst.white"
+        ]
+    },
+    "inner-radiance-torrent": {
+        "projectile": [
+            "jb2a.ranged.beam.001.01.orange"
+        ]
+    },
+    "paranoia": {
+        "impact": [
+            "jb2a.eyes.01.dark_green.many",
+            "jb2a.eyes.01.dark_yellow.many"
+        ]
+    },
+    "powerful-inhalation": {
+        "areaEffect": [
+            "jb2a.explosion.04.blue"
+        ]
+    },
+    "revealing-light": {
+        "areaEffect": [
+            "jb2a.markers.circle_of_stars.blue"
+        ]
+    },
+    "worms-repast": {
+        "impact": [
+            "jb2a.butterflies.many.orange",
+            "jb2a.butterflies.complete.01.white"
+        ]
+    },
+    "combustion": {
+        "impact": [
+            "jb2a.flames.orange.03.2x2"
+        ]
+    },
+    "earthbind": {
+        "impact": [
+            "jb2a.markers.chain.spectral_standard.complete.02.blue",
+            "jb2a.markers.chain.diamond.loop.01.yellow"
+        ]
+    },
+    "holy-light": {
+        "projectile": [
+            "jb2a.guiding_bolt.01.blueyellow",
+            "jb2a.eldritch_blast.rainbow"
+        ]
+    },
+    "magnetic-acceleration": {
+        "projectile": [
+            "jb2a.ranged.02.instant.01.yellow"
+        ]
+    },
+    "bloodspray-curse": {
+        "impact": [
+            "jb2a.liquid.splash.red",
+            "jb2a.liquid.splash.blue"
+        ]
+    },
+    "cinder-swarm": {
+        "areaEffect": [
+            "jb2a.fire_ring.500px.red"
+        ]
+    },
+    "divine-wrath": {
+        "impact": [
+            "jb2a.divine_smite.caster.blueyellow",
+            "jb2a.divine_smite.caster.yellowwhite",
+            "jb2a.divine_smite.caster.dark_purple"
+        ],
+        "areaEffect": [
+            "jb2a.divine_smite.target.blueyellow",
+            "jb2a.divine_smite.target.yellowwhite",
+            "jb2a.divine_smite.target.dark_purple"
+        ]
+    },
+    "vision-of-death": {
+        "impact": [
+            "jb2a.toll_the_dead.green.skull_smoke",
+            "jb2a.toll_the_dead.purple.skull_smoke"
+        ]
+    },
+    "ymeris-mark": {
+        "impact": [
+            "jb2a.magic_signs.rune.transmutation.intro.yellow",
+            "jb2a.explosion.01.orange"
+        ]
+    },
+    "entwined-roots": {
+        "areaEffect": [
+            "jb2a.entangle.brown"
+        ]
+    },
+    "flames-of-ego": {
+        "impact": [
+            "jb2a.markers.on_token_mask.complete.01.orange"
+        ]
+    },
+    "flammable-fumes": {
+        "areaEffect": [
+            "jb2a.wind_lines.01.01.white"
+        ]
+    },
+    "freezing-rain": {
+        "areaEffect": [
+            "jb2a.impact.frost.white.01",
+            "jb2a.sleet_storm.blue"
+        ]
+    },
+    "howling-blizzard": {
+        "areaEffect": [
+            "jb2a.cone_of_cold.blue",
+            "jb2a.burning_hands.01.orange",
+            "jb2a.sleet_storm.blue",
+            "jb2a.fireball.explosion.orange"
+        ],
+        "impact": [
+            "jb2a.ice_spikes.radial.burst.white",
+            "jb2a.impact.fire.01.orange.0"
+        ]
+    },
+    "impaling-spike": {
+        "impact": [
+            "jb2a.template_line_piercing.generic.01.orange.15ft"
+        ]
+    },
+    "pressure-zone": {
+        "areaEffect": [
+            "jb2a.soundwave.01.blue"
+        ]
+    },
+    "synesthesia": {
+        "impact": [
+            "jb2a.particles.swirl.greenyellow.01.01"
+        ]
+    },
+    "toxic-cloud": {
+        "areaEffect": [
+            "jb2a.darkness.green"
+        ]
+    },
+    "disintegrate": {
+        "projectile": [
+            "jb2a.disintegrate.green",
+            "jb2a.disintegrate.dark_red"
+        ]
+    },
+    "flame-vortex": {
+        "areaEffect": [
+            "jb2a.template_circle.vortex.intro.blue",
+            "jb2a.template_circle.vortex.loop.blue",
+            "jb2a.template_circle.vortex.intro.orange",
+            "jb2a.template_circle.vortex.loop.orange"
+        ]
+    },
+    "spirit-blast": {
+        "projectile": [
+            "jb2a.ranged.03.instant.01.bluegreen"
+        ]
+    },
+    "polar-ray": {
+        "projectile": [
+            "jb2a.ray_of_frost.blue",
+            "jb2a.scorching_ray.01.orange"
+        ],
+        "impact": [
+            "jb2a.ice_spikes.radial.burst.white",
+            "jb2a.fireball.explosion.orange"
+        ]
+    },
+    "falling-stars": {
+        "areaEffect": [
+            "jb2a.divine_smite.target.blueyellow",
+            "jb2a.template_circle.out_pulse.02.burst.bluewhite"
+        ]
+    }
+};
+
+// Returns the first valid JB2A path for a spell slug/role from
+// PF2E_GRAPHICS_ASSET_MAP, or null if the slug/role has no entry or none of
+// its candidates validate. Memoized in ASSET_CACHE.
+function resolvePf2eGraphicsAsset(slug, role) {
+    if (!slug || !role) return null;
+    const cacheKey = `pf2eGraphics-${slug}-${role}`;
+    if (ASSET_CACHE.has(cacheKey)) return ASSET_CACHE.get(cacheKey);
+
+    const candidates = PF2E_GRAPHICS_ASSET_MAP[slug]?.[role] || [];
+    let result = null;
+    for (const candidate of candidates) {
+        if (isValidSequencerPath(candidate)) {
+            result = candidate;
+            break;
+        }
+    }
+
+    ASSET_CACHE.set(cacheKey, result);
+    return result;
+}
+
+// NEW (Phase J): Gap-tracking helper. Scans every spell Item across all
+// installed compendiums, checks whether its slug has a PF2E_GRAPHICS_ASSET_MAP
+// entry, and logs coverage stats plus a sample of uncovered spell names. Run
+// from the console: reportPf2eGraphicsCoverage()
+async function reportPf2eGraphicsCoverage() {
+    const covered = [];
+    const uncovered = [];
+    const seenSlugs = new Set();
+
+    for (const pack of game.packs) {
+        if (pack.documentName !== "Item") continue;
+
+        let index;
+        try {
+            index = await pack.getIndex({ fields: ["type"] });
+        } catch (e) {
+            continue;
+        }
+
+        for (const entry of index) {
+            if (entry.type !== "spell") continue;
+
+            const slug = getSpellSlug({ name: entry.name, slug: entry.slug });
+            if (!slug || seenSlugs.has(slug)) continue;
+            seenSlugs.add(slug);
+
+            if (PF2E_GRAPHICS_ASSET_MAP[slug]) {
+                covered.push({ name: entry.name, slug });
+            } else {
+                uncovered.push({ name: entry.name, slug });
+            }
+        }
+    }
+
+    const total = covered.length + uncovered.length;
+    const pct = total > 0 ? ((covered.length / total) * 100).toFixed(1) : "0.0";
+
+    console.log(`%cPF2e Heuristic | PF2e Graphics asset coverage: ${covered.length}/${total} spells (${pct}%)`, "color:#ffaa00;font-weight:bold;");
+    console.log("PF2e Heuristic | Covered spells:", covered.map(c => c.name).sort());
+    console.log("PF2e Heuristic | Uncovered spells (sample of 25):", uncovered.slice(0, 25).map(c => c.name).sort());
+
+    return { covered, uncovered, total, coveragePercent: pct };
+}
 
 // ============================================================
 // 2.1 ENHANCED CLASSIFICATION DICTIONARY (NEW - Part 1.1)
@@ -739,9 +1313,7 @@ function parseSpellToAnimation(spell) {
     if (getSettingSafe("skipCuratedSpells")) {
         const curatedSet = getCuratedSpellSet();
         if (curatedSet.size > 0) {
-            const spellSlug = spell.slug || (typeof spell.name?.slugify === "function"
-                ? spell.name.slugify({ strict: true })
-                : (spell.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
+            const spellSlug = getSpellSlug(spell);
 
             if (spellSlug && curatedSet.has(spellSlug)) {
                 const curatedConfig = { type: "CURATED_SPELL", spellSlug, originalSpellName: spell.name };
@@ -840,6 +1412,41 @@ function parseSpellToAnimation(spell) {
             const variants = resolveAssetVariants(assetType, variantColor);
             if (variants.length > 1) {
                 config[`${assetType}Variants`] = variants;
+            }
+        }
+    }
+
+    // NEW (Phase J): Apply hand-curated PF2e Graphics asset overrides, if
+    // available and enabled. Only overrides slots with a valid mapped asset;
+    // everything else keeps its heuristic-derived value.
+    if (getSettingSafe("usePf2eGraphicsAssets")) {
+        const pgSlug = getSpellSlug(spell);
+        if (pgSlug && PF2E_GRAPHICS_ASSET_MAP[pgSlug]) {
+            const pgProjectile = resolvePf2eGraphicsAsset(pgSlug, "projectile");
+            if (pgProjectile) {
+                config.projectile = pgProjectile;
+                delete config.projectileVariants;
+            }
+
+            const pgImpact = resolvePf2eGraphicsAsset(pgSlug, "impact");
+            if (pgImpact) {
+                config.impact = pgImpact;
+                delete config.impactVariants;
+            }
+
+            const pgArea = resolvePf2eGraphicsAsset(pgSlug, "areaEffect");
+            if (pgArea) {
+                if (config.type === "cone" || config.type === "line") {
+                    config.areaEffect = pgArea;
+                } else if (config.type === "burst") {
+                    config.groundRing = pgArea;
+                    delete config.groundRingVariants;
+                }
+            }
+
+            if (pgProjectile || pgImpact || pgArea) {
+                config.pf2eGraphicsSlug = pgSlug;
+                console.debug(`PF2e Heuristic | Applied PF2e Graphics asset overrides for "${pgSlug}"`);
             }
         }
     }
@@ -1341,4 +1948,4 @@ globalThis._pf2eHeuristicCCHookIds.push({
     })
 });
 
-console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity)");
+console.log("PF2e Heuristic Fallback Engine | Version 7.1.1+ Enhanced (Classification Layer + Asset Fallback Chains + Curated Spell Support + Enhanced Keyword Classification + Random Variants + Concurrency Protection + Configuration Caching + Template Placement Handling + Persistent CC Effects + Elemental Area Shapes + Structured Burst Detection + Ring Color Diversity + PF2e Graphics Asset Import)");
