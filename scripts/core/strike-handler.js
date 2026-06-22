@@ -41,18 +41,22 @@ Hooks.off("createChatMessage", globalThis._pf2eHeuristicStrikeHookId);
 
 globalThis._pf2eHeuristicStrikeHookId = Hooks.on("createChatMessage", (message, options, userId) => {
     if (userId !== game.user.id) return;
+    console.log(`%cPF2E HEURISTIC [K4 diag] %c| Strike hook: enable=${getSettingSafe("enable")} enableStrikeAnimations=${getSettingSafe("enableStrikeAnimations")}`, "color:#ff9900;font-weight:bold;", "color:#cccccc;");
     if (!getSettingSafe("enable")) return;
     if (!getSettingSafe("enableStrikeAnimations")) return;
 
     try {
         const context = message.flags?.pf2e?.context;
+        console.log(`%cPF2E HEURISTIC [K4 diag] %c| createChatMessage fired | context.type="${context?.type}" | userId match=${userId === game.user.id}`, "color:#ff9900;font-weight:bold;", "color:#cccccc;");
         if (!context || context.type !== "attack-roll") return;
 
         const item = message.item;
+        console.log(`%cPF2E HEURISTIC [K4 diag] %c| context.type=attack-roll | item=${item?.name} (type=${item?.type})`, "color:#ff9900;font-weight:bold;", "color:#cccccc;");
         if (!item) return;
         if (!["weapon", "melee", "action", "feat"].includes(item.type)) return;
 
         const token = message.actor?.getActiveTokens()?.[0] || canvas.tokens?.controlled?.[0];
+        console.log(`%cPF2E HEURISTIC [K4 diag] %c| item type ok | token=${token?.name}`, "color:#ff9900;font-weight:bold;", "color:#cccccc;");
         if (!token) return;
 
         const rollOptions = context.options;
@@ -72,6 +76,7 @@ globalThis._pf2eHeuristicStrikeHookId = Hooks.on("createChatMessage", (message, 
         const projectile = resolveRole("projectile");
         const impact = resolveRole("impact");
 
+        console.log(`%cPF2E HEURISTIC [K4 diag] %c| weaponKeys=${JSON.stringify(weaponKeys)} rangeKind=${rangeKind} | resolved projectile="${projectile}" impact="${impact}"`, "color:#ff9900;font-weight:bold;", "color:#cccccc;");
         if (!projectile && !impact) return;
 
         const animationConfig = {
@@ -92,6 +97,6 @@ globalThis._pf2eHeuristicStrikeHookId = Hooks.on("createChatMessage", (message, 
         console.log(`%cPF2E HEURISTIC %c| Strike animation for: "${item.name}" (${rangeKind})`, "color: #00ffcc; font-weight: bold;", "color: #ffffff;");
         executeHeuristicAnimation(mockSpell, token, animationConfig);
     } catch (e) {
-        console.debug("PF2e Heuristic | Strike animation hook error (non-fatal):", e.message);
+        console.log(`%cPF2E HEURISTIC [K4 diag] %c| Strike hook caught error: ${e.message}`, "color:#ff3333;font-weight:bold;", "color:#cccccc;", e);
     }
 });
