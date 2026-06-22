@@ -130,6 +130,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    // NEW (Phase K6): Gates the damage-roll animation hook.
+    safeRegister("enableDamageRollAnimations", {
+        name: "Enable Damage Roll Animations",
+        hint: "Play animations when a damage roll is reported (e.g. electric-arc chain lightning, force barrage missile). Only fires for spells with authored tree entries.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
     // NEW (Phase K5): Gates the saving-throw animation hook.
     safeRegister("enableSaveAnimations", {
         name: "Enable Saving Throw Animations",
@@ -168,6 +177,7 @@ const getSettingSafe = (key) => {
         animationQualityLevel: 1,
         usePersistentAnimations: false,
         enableStrikeAnimations: false,
+        enableDamageRollAnimations: true,
         enableSaveAnimations: true
     };
     return fallbacks[key];
