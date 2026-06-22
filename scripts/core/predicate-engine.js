@@ -77,7 +77,7 @@ function buildPredicateContext(item, options = {}) {
     const originTraits = (options.origin?.system?.traits?.value || []).map(t => String(t).toLowerCase());
     for (const trait of originTraits) facts.add(`origin:item:trait:${trait}`);
 
-    if (traits.includes("thrown")) {
+    if (traits.some(t => t === "thrown" || t.startsWith("thrown-"))) {
         facts.add("thrown");
         facts.add("item:thrown");
     }
