@@ -243,6 +243,11 @@ function parseSpellToAnimation(spell) {
         config.type = "burst";
     } else if (searchString.includes("burst") || searchString.includes("emanation") || searchString.includes("radius") || searchString.includes("splash")) {
         config.type = "burst";
+    } else if (areaShape === "cone" || searchString.includes("foot cone") || searchString.includes("-foot cone")) {
+        // Cone keyword detection for spells cast from chat messages where the
+        // structured area data isn't available on the mock spell object.
+        // areaEffect is set below by Phase H (elemental) or the K3 tree block.
+        config.type = "cone";
     } else if (searchString.includes("touch") || searchString.includes("melee strike")) {
         config.type = "melee";
     } else if (searchString.includes("target yourself") || searchString.includes("buff") || searchString.includes("healing")) {

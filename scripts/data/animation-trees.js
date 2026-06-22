@@ -2003,5 +2003,12 @@ const PF2E_ANIMATION_TREES = {
     "stoke-the-heart": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.boon.01.001.red"}],
     "summon-instrument": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.markers.music"}],
     "telekinetic-hand": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.arcane_hand"}],
-    "wilding-word": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.023.green"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.curse.01.023.purple"}]
+    "wilding-word": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.023.green"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.curse.01.023.purple"}],
+    "bullhorn": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.soundwave.01.blue"}],
+    "gale-blast": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.whirlwind.bluegrey"}],
+    "haunting-hymn": [{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:patreon"],"file":"jb2a.side_impact.part.slow.music_note.pink"},{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:free"],"file":"jb2a.side_impact.part.shockwave.blue"}],
+    "live-wire": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.lightning_orb.01.loop.bluepurple.0"}],
+    "puff-of-poison": [{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:patreon"],"file":"jb2a.smoke.puff.side.green"},{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:free"],"file":"jb2a.smoke.puff.side.grey"}],
+    "scatter-scree": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.falling_rocks.side.2x1.grey"}],
+    "spout": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.water_splash.circle.01.blue"}]
 };
