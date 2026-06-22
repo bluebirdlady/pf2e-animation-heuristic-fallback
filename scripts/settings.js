@@ -130,6 +130,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    // NEW (Phase K5): Gates the saving-throw animation hook.
+    safeRegister("enableSaveAnimations", {
+        name: "Enable Saving Throw Animations",
+        hint: "Play outcome-aware animations when a saving throw result is reported. Only fires for spells with authored tree entries — no heuristic fallback, so no false positives.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
 
 if (game.ready || game.canvas?.ready) {
@@ -158,7 +167,8 @@ const getSettingSafe = (key) => {
         usePf2eGraphicsAssets: true,
         animationQualityLevel: 1,
         usePersistentAnimations: false,
-        enableStrikeAnimations: false
+        enableStrikeAnimations: false,
+        enableSaveAnimations: true
     };
     return fallbacks[key];
 };

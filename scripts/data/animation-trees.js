@@ -2010,5 +2010,12 @@ const PF2E_ANIMATION_TREES = {
     "live-wire": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.lightning_orb.01.loop.bluepurple.0"}],
     "puff-of-poison": [{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:patreon"],"file":"jb2a.smoke.puff.side.green"},{"trigger":"attack-roll","role":"areaEffect","predicate":["jb2a:free"],"file":"jb2a.smoke.puff.side.grey"}],
     "scatter-scree": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.falling_rocks.side.2x1.grey"}],
-    "spout": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.water_splash.circle.01.blue"}]
+    "spout": [{"trigger":"attack-roll","role":"areaEffect","predicate":[],"file":"jb2a.water_splash.circle.01.blue"}],
+    "bullhorn": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.soundwave.01.blue"}],
+    "gale-blast": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.whirlwind.bluegrey"}],
+    "haunting-hymn": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]},"jb2a:patreon"],"file":"jb2a.side_impact.part.slow.music_note.pink"},{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]},"jb2a:free"],"file":"jb2a.side_impact.part.shockwave.blue"}],
+    "puff-of-poison": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]},"jb2a:patreon"],"file":"jb2a.smoke.puff.side.green"},{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]},"jb2a:free"],"file":"jb2a.smoke.puff.side.grey"}],
+    "scatter-scree": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.falling_rocks.side.2x1.grey"}],
+    "spout": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.water_splash.circle.01.blue"}],
+    "wilding-word": [{"trigger":"saving-throw","role":"tokenBuff","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.condition.curse.01.023.purple"}]
 };
