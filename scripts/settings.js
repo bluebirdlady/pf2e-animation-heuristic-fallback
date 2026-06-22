@@ -130,6 +130,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    // NEW (Phase K7): Gates the damage-taken (HP-change) animation hook.
+    safeRegister("enableDamageTakenAnimations", {
+        name: "Enable Damage-Taken / Healing-Received Animations",
+        hint: "Play animations when a token's HP changes after a damage or healing roll (e.g. Heal green orb, Lay on Hands). Fires on HP update, not on dice roll.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
     // NEW (Phase K6): Gates the damage-roll animation hook.
     safeRegister("enableDamageRollAnimations", {
         name: "Enable Damage Roll Animations",
@@ -177,6 +186,7 @@ const getSettingSafe = (key) => {
         animationQualityLevel: 1,
         usePersistentAnimations: false,
         enableStrikeAnimations: false,
+        enableDamageTakenAnimations: true,
         enableDamageRollAnimations: true,
         enableSaveAnimations: true
     };

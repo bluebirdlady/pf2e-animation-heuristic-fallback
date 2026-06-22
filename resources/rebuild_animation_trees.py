@@ -106,6 +106,10 @@ def ar(role, file, pred=None):
     return {"trigger": "attack-roll",   "role": role, "predicate": pred or [], "file": file}
 def sv(role, file, pred=None):
     return {"trigger": "saving-throw",  "role": role, "predicate": pred or [], "file": file}
+def dt(role, file, pred=None):
+    return {"trigger": "damage-taken",  "role": role, "predicate": pred or [], "file": file}
+def dr(role, file, pred=None):
+    return {"trigger": "damage-roll",   "role": role, "predicate": pred or [], "file": file}
 
 MANUAL_PAIRS = [
 
