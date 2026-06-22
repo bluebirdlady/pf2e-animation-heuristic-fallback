@@ -80,7 +80,8 @@ globalThis._pf2eHeuristicStrikeHookId = Hooks.on("createChatMessage", (message, 
             blend: false,
             projectile,
             impact,
-            pf2eGraphicsSlug: weaponKeys.slug
+            pf2eGraphicsSlug: weaponKeys.slug,
+            isStrike: true  // weapon swings originate at attacker, not target
         };
 
         const mockSpell = {

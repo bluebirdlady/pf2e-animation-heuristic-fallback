@@ -190,16 +190,27 @@ async function executeHeuristicAnimation(spell, token, precomputedConfig = null)
             }
         }
     }
-    // PHASE 3: Melee / Touch Pipeline (RESTORED)
+    // PHASE 3: Melee / Touch Pipeline
     else if (animationConfig.type === "melee" && targets.length > 0) {
         for (const target of targets) {
             if (animationConfig.impact) {
                 console.log(`%c[DEPLOYING] Melee Impact -> .file(${animationConfig.impactVariants ? `[${animationConfig.impactVariants.length} variants]` : `"${animationConfig.impact}"`}) on target: ${target.name}`, "color: #00ccff;");
-                let impactElement = seq.effect()
-                    .file(animationConfig.impactVariants || animationConfig.impact)
-                    .atLocation(target)
-                    .size(target.document.width * 1.5, { gridUnits: true });
-
+                let impactElement;
+                if (animationConfig.isStrike) {
+                    // Weapon swing: originates at attacker, rotated toward target.
+                    // No explicit .size() - let Sequencer use the animation's
+                    // natural scale (weapon animations are sized for the canvas).
+                    impactElement = seq.effect()
+                        .file(animationConfig.impactVariants || animationConfig.impact)
+                        .atLocation(token)
+                        .rotateTowards(target);
+                } else {
+                    // Touch/melee spell impact: placed at the target.
+                    impactElement = seq.effect()
+                        .file(animationConfig.impactVariants || animationConfig.impact)
+                        .atLocation(target)
+                        .size(target.document.width * 1.5, { gridUnits: true });
+                }
                 if (animationConfig.blend) impactElement.blendMode("ADD");
             }
         }
