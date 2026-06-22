@@ -1992,5 +1992,16 @@ const PF2E_ANIMATION_TREES = {
     "light": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.dancing_light.blueteal"}],
     "prestidigitation": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.arcane_hand.purple"}],
     "read-aura": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.detect_magic.circle.green"}],
-    "stabilize": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.healing_generic.200px.purple"}]
+    "stabilize": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.healing_generic.200px.purple"}],
+    "discern-secrets": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff.001.004.bluepurple"}],
+    "evil-eye": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_cast.initiate.001.instant.combined.greenpurple"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.eyes"}],
+    "house-of-imaginary-walls": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.energy_wall.01.circle.500x500.01.complete.blue"}],
+    "know-the-way": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff.001.001.pinkyellow"}],
+    "message": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.guiding_bolt.02.purplepink"}],
+    "nudge-fate": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_cast.initiate.001.instant.combined.blueteal"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.on_token_buff.003.004.blue"}],
+    "sigil": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.magic_signs.rune"}],
+    "stoke-the-heart": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.boon.01.001.red"}],
+    "summon-instrument": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.markers.music"}],
+    "telekinetic-hand": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.arcane_hand"}],
+    "wilding-word": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.023.green"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.curse.01.023.purple"}]
 };
