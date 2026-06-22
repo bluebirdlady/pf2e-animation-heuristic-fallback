@@ -56,6 +56,36 @@ function resolveAnimationTreeAsset(slug, trigger, role, context) {
     return result;
 }
 
+// NEW (Phase K8): Returns ALL valid files for (slug, trigger, role) whose
+// predicates match ctx, deduplicated by file path. Each result carries
+// {file, persistent} where persistent=true if "settings:persistent" appears
+// anywhere in that candidate's predicate — callers use this to play the
+// animation with .persist() vs. as a one-shot. Needed for place-template
+// entries that intentionally match multiple entries (e.g. alarm: intro once +
+// complete loop when settings:persistent is enabled).
+function resolveAllAnimationTreeEntries(slug, trigger, role, context) {
+    if (!slug || !trigger || !role) return [];
+    const candidates = PF2E_ANIMATION_TREES[slug] || [];
+    const ctx = {
+        facts: context?.facts || new Set(),
+        values: context?.values || {}
+    };
+    const seen = new Set();
+    const results = [];
+    for (const candidate of candidates) {
+        if (candidate.trigger !== trigger || candidate.role !== role) continue;
+        if (!evaluatePredicate(candidate.predicate, ctx)) continue;
+        if (!isValidSequencerPath(candidate.file)) continue;
+        if (seen.has(candidate.file)) continue;
+        seen.add(candidate.file);
+        const predArr = Array.isArray(candidate.predicate)
+            ? candidate.predicate : [candidate.predicate];
+        const persistent = predArr.some(p => p === "settings:persistent");
+        results.push({ file: candidate.file, persistent });
+    }
+    return results;
+}
+
 // NEW (Phase K4): Resolves a weapon-strike animation asset for (trigger,
 // role), trying PF2E_STRIKE_TREES.bySlug[weapon.slug], then
 // .byBase[weapon.baseType], then .byGroup[weapon.group] - most specific

@@ -130,6 +130,15 @@ const registerSettings = () => {
         type: Boolean,
         default: false
     });
+    // NEW (Phase K8): Gates the place-template animation hook.
+    safeRegister("enablePlaceTemplateAnimations", {
+        name: "Enable Measured Template Placement Animations",
+        hint: "Play area-effect animations (cone, burst, etc.) when a PF2e spell template is placed on the canvas. Only fires for spells with authored tree entries.",
+        scope: "client",
+        config: true,
+        type: Boolean,
+        default: true
+    });
     // NEW (Phase K7): Gates the damage-taken (HP-change) animation hook.
     safeRegister("enableDamageTakenAnimations", {
         name: "Enable Damage-Taken / Healing-Received Animations",
@@ -186,6 +195,7 @@ const getSettingSafe = (key) => {
         animationQualityLevel: 1,
         usePersistentAnimations: false,
         enableStrikeAnimations: false,
+        enablePlaceTemplateAnimations: true,
         enableDamageTakenAnimations: true,
         enableDamageRollAnimations: true,
         enableSaveAnimations: true
