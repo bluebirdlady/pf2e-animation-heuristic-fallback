@@ -1985,5 +1985,12 @@ const PF2E_ANIMATION_TREES = {
     "song-of-marching": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff"}],
     "song-of-strength": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff"}],
     "triple-time": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}],
-    "uplifting-overture": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}]
+    "uplifting-overture": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}],
+    "figment": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.gust_of_wind.default"}],
+    "forbidding-ward": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff.002.002"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.boon.01.011.yellow"}],
+    "guidance": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.guiding_bolt.01.greenorange"}],
+    "light": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.dancing_light.blueteal"}],
+    "prestidigitation": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.arcane_hand.purple"}],
+    "read-aura": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.detect_magic.circle.green"}],
+    "stabilize": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.healing_generic.200px.purple"}]
 };

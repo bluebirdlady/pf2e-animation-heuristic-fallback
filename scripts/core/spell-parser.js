@@ -302,15 +302,29 @@ function parseSpellToAnimation(spell) {
                 resolveAnimationTreeAsset(pgSlug, "attack-roll", role, treeContext)
                 || resolvePf2eGraphicsAsset(pgSlug, role);
 
-            const pgProjectile = resolveRole("projectile");
+            // Track tree vs. flat-map source so we can suppress the generic
+            // partner animation when only one side has a tree entry — avoids a
+            // mismatched generic bolt before an impact-only spell, or a generic
+            // circle after a bolt-only one. Flat-map-only entries are unaffected.
+            const treeProjectile = resolveAnimationTreeAsset(pgSlug, "attack-roll", "projectile", treeContext);
+            const pgProjectile = treeProjectile || resolvePf2eGraphicsAsset(pgSlug, "projectile");
             if (pgProjectile) {
                 config.projectile = pgProjectile;
                 delete config.projectileVariants;
             }
 
-            const pgImpact = resolveRole("impact");
+            const treeImpact = resolveAnimationTreeAsset(pgSlug, "attack-roll", "impact", treeContext);
+            const pgImpact = treeImpact || resolvePf2eGraphicsAsset(pgSlug, "impact");
             if (pgImpact) {
                 config.impact = pgImpact;
+                delete config.impactVariants;
+            }
+
+            if (treeImpact && !treeProjectile) {
+                config.projectile = null;
+                delete config.projectileVariants;
+            } else if (treeProjectile && !treeImpact) {
+                config.impact = null;
                 delete config.impactVariants;
             }
 
