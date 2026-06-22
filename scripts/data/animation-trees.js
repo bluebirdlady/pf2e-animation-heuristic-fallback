@@ -132,6 +132,23 @@ const PF2E_ANIMATION_TREES = {
     "telekinetic-hand": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.arcane_hand"}],
     "wilding-word": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.023.green"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.condition.curse.01.023.purple"},{"trigger":"saving-throw","role":"tokenBuff","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.condition.curse.01.023.purple"}],
     "bullhorn": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.soundwave.01.blue"},{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.soundwave.01.blue"}],
-    "live-wire": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.lightning_orb.01.loop.bluepurple.0"}]
+    "live-wire": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.lightning_orb.01.loop.bluepurple.0"}],
+    "sure-strike": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.001.blue"}],
+    "anticipate-peril": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.markers.circle_of_stars.blue"}],
+    "scholars-warning": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.markers.circle_of_stars.blue"}],
+    "mystic-armor": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.shield.01"}],
+    "protection": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff.002.002"}],
+    "sanctuary": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.011.yellow"}],
+    "feather-fall": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.wind_lines.01.01.white"}],
+    "longstrider": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.wind_lines.01.01.white"}],
+    "fleet-step": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff.003.004.blue"}],
+    "jump": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_cast.initiate.001.instant.combined.blueteal"}],
+    "pest-form": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_cast.initiate.001.instant.combined.greenpurple"}],
+    "illusory-disguise": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_cast.initiate.001.instant.combined.blueteal"}],
+    "bless": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.condition.boon.01.011.yellow"},{"trigger":"place-template","role":"areaEffect","predicate":[],"file":"jb2a.bless.200px.loop.yellow"},{"trigger":"place-template","role":"areaEffect","predicate":["settings:persistent"],"file":"jb2a.bless.200px.loop.yellow"}],
+    "magic-missile": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.magic_missile.purple"}],
+    "hydraulic-push": [{"trigger":"attack-roll","role":"projectile","predicate":["jb2a:patreon"],"file":"jb2a.bullet.01.blue"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.liquid.splash.blue"}],
+    "fear": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.markers.evil.darkred"}],
+    "sleep": [{"trigger":"saving-throw","role":"impact","predicate":[{"or":["check:outcome:failure","check:outcome:critical-failure"]}],"file":"jb2a.darkness.black"}]
 
 };

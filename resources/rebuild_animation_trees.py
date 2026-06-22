@@ -110,6 +110,8 @@ def dt(role, file, pred=None):
     return {"trigger": "damage-taken",  "role": role, "predicate": pred or [], "file": file}
 def dr(role, file, pred=None):
     return {"trigger": "damage-roll",   "role": role, "predicate": pred or [], "file": file}
+def pt(role, file, pred=None):
+    return {"trigger": "place-template","role": role, "predicate": pred or [], "file": file}
 
 MANUAL_PAIRS = [
 
@@ -177,6 +179,50 @@ MANUAL_PAIRS = [
     ("scatter-scree", sv("impact",   "jb2a.falling_rocks.side.2x1.grey",                   fail_pred)),
     ("spout",         sv("impact",   "jb2a.water_splash.circle.01.blue",                   fail_pred)),
     ("wilding-word",  sv("tokenBuff","jb2a.condition.curse.01.023.purple",                 fail_pred)),
+
+    # 8.5.0 — PC1 first-level spell coverage
+    # Self-buff / tokenBuff spells: attack-roll trigger fires from the main
+    # spell-cast flow (parseSpellToAnimation), not from K3 chat hooks. The
+    # "utility" type is forced automatically when only tokenBuff is set.
+
+    # Divination buffs
+    ("sure-strike",      ar("tokenBuff","jb2a.condition.boon.01.001.blue")),
+    ("anticipate-peril", ar("tokenBuff","jb2a.markers.circle_of_stars.blue")),
+    ("scholars-warning", ar("tokenBuff","jb2a.markers.circle_of_stars.blue")),
+
+    # Abjuration buffs
+    ("mystic-armor",  ar("tokenBuff","jb2a.shield.01")),
+    ("protection",    ar("tokenBuff","jb2a.on_token_buff.002.002")),
+    ("sanctuary",     ar("tokenBuff","jb2a.condition.boon.01.011.yellow")),
+    ("feather-fall",  ar("tokenBuff","jb2a.wind_lines.01.01.white")),
+
+    # Transmutation movement buffs
+    ("longstrider",  ar("tokenBuff","jb2a.wind_lines.01.01.white")),
+    ("fleet-step",   ar("tokenBuff","jb2a.on_token_buff.003.004.blue")),
+    ("jump",         ar("tokenBuff","jb2a.on_token_cast.initiate.001.instant.combined.blueteal")),
+
+    # Polymorph / illusion self-transforms
+    ("pest-form",        ar("tokenBuff","jb2a.on_token_cast.initiate.001.instant.combined.greenpurple")),
+    ("illusory-disguise",ar("tokenBuff","jb2a.on_token_cast.initiate.001.instant.combined.blueteal")),
+
+    # Bless: cast tokenBuff (yellow boon on caster) + place-template aura
+    ("bless", ar("tokenBuff","jb2a.condition.boon.01.011.yellow")),
+    ("bless", pt("areaEffect","jb2a.bless.200px.loop.yellow")),
+    ("bless", pt("areaEffect","jb2a.bless.200px.loop.yellow", ["settings:persistent"])),
+
+    # Magic Missile: specific force missile projectile; no tree impact so the
+    # generic explosion is suppressed (treeProjectile && !treeImpact → impact=null).
+    ("magic-missile", ar("projectile","jb2a.magic_missile.purple")),
+
+    # Hydraulic Push: water bullet (patreon) + splash impact; heuristic bolt suppressed.
+    ("hydraulic-push", ar("projectile","jb2a.bullet.01.blue", ["jb2a:patreon"])),
+    ("hydraulic-push", ar("impact",   "jb2a.liquid.splash.blue")),
+
+    # Fear: dark flash at target; no tree projectile so generic bolt is suppressed.
+    ("fear", ar("impact","jb2a.markers.evil.darkred")),
+
+    # Sleep: darkness falls on tokens that fail the save.
+    ("sleep", sv("impact","jb2a.darkness.black", fail_pred)),
 ]
 
 # Merge manual entries (add new slugs at end; merge into existing)
@@ -203,8 +249,9 @@ open(OUT_PATH, 'w', encoding='utf-8').write(new_content)
 
 # ── report ─────────────────────────────────────────────────────────────────
 print(f"\nFinal file: {len(slug_order)} unique slugs")
-for chk in ['acid-splash', 'electric-arc', 'produce-flame', 'gale-blast', 'spout',
-            'wilding-word', 'bullhorn', 'live-wire', 'dirge-of-doom']:
+for chk in ['acid-splash', 'electric-arc', 'gale-blast', 'wilding-word',
+            'sure-strike', 'mystic-armor', 'protection', 'sanctuary',
+            'bless', 'magic-missile', 'hydraulic-push', 'fear', 'sleep']:
     entries = slug_entries.get(chk, [])
     triggers = sorted({e['trigger'] for e in entries})
     print(f"  {chk}: {len(entries)} entries  triggers={triggers}")
