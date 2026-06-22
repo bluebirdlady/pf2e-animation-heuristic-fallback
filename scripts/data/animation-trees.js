@@ -1973,5 +1973,9 @@ const PF2E_ANIMATION_TREES = {
             ],
             "file": "jb2a.cone_of_cold.blue"
         }
-    ]
+    ],
+    "clinging-ice": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.ray_of_frost.blue"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.ice_spikes.radial.burst.white"}],
+    "shield": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.shield.01"}],
+    "shroud-of-night": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.darkness.black"}],
+    "tangle-vine": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.vine.complete"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.entangle.green"}]
 };

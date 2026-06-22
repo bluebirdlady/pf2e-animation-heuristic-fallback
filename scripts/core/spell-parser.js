@@ -324,7 +324,14 @@ function parseSpellToAnimation(spell) {
                 }
             }
 
-            if (pgProjectile || pgImpact || pgArea) {
+            const pgTokenBuff = resolveRole("tokenBuff");
+            if (pgTokenBuff) {
+                config.tokenBuff = pgTokenBuff;
+                delete config.tokenBuffVariants;
+                config.type = "utility";
+            }
+
+            if (pgProjectile || pgImpact || pgArea || pgTokenBuff) {
                 config.pf2eGraphicsSlug = pgSlug;
                 console.debug(`PF2e Heuristic | Applied PF2e Graphics asset overrides for "${pgSlug}"`);
             }
