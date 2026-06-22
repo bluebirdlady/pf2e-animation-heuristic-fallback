@@ -20,7 +20,7 @@ function isValidSequencerPath(testPath) {
             if (rawStringified.includes(':""') || rawStringified.includes(':\\"\\"') || !rawStringified.includes('.webm')) {
                 return false;
             }
-            if (entry.file !== undefined || entry.children !== undefined) {
+            if (Array.isArray(entry) ? entry.length > 0 : entry.file !== undefined || entry.children !== undefined) {
                 return true;
             }
         }
