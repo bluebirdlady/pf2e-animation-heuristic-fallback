@@ -941,6 +941,54 @@
         ],
         "file": "jb2a.wrench.melee.01.white"
       }
+    ],
+    "boomerang": [
+      {
+        "trigger": "attack-roll",
+        "role": "projectile",
+        "predicate": [
+          "ranged"
+        ],
+        "file": "jb2a.boomerang.01.white"
+      }
+    ],
+    "chakram": [
+      {
+        "trigger": "attack-roll",
+        "role": "projectile",
+        "predicate": [
+          "ranged"
+        ],
+        "file": "jb2a.chakram.01.throw"
+      },
+      {
+        "trigger": "attack-roll",
+        "role": "impact",
+        "predicate": [
+          "ranged"
+        ],
+        "file": "jb2a.chakram.01.return"
+      }
+    ],
+    "greatclub": [
+      {
+        "trigger": "attack-roll",
+        "role": "impact",
+        "predicate": [
+          "melee"
+        ],
+        "file": "jb2a.greatclub.standard.white"
+      }
+    ],
+    "javelin": [
+      {
+        "trigger": "attack-roll",
+        "role": "projectile",
+        "predicate": [
+          "ranged"
+        ],
+        "file": "jb2a.javelin.throw"
+      }
     ]
   },
   "byGroup": {
