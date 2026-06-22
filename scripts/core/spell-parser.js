@@ -328,7 +328,13 @@ function parseSpellToAnimation(spell) {
             if (pgTokenBuff) {
                 config.tokenBuff = pgTokenBuff;
                 delete config.tokenBuffVariants;
-                config.type = "utility";
+                config.treeTokenBuff = true;
+                // Pure self-buff: force utility so a stray target doesn't trigger
+                // the projectile pipeline. Hybrid spells (tokenBuff + impact) keep
+                // the heuristic type and play tokenBuff via the guaranteed Phase 0.
+                if (!pgProjectile && !pgImpact && !pgArea) {
+                    config.type = "utility";
+                }
             }
 
             if (pgProjectile || pgImpact || pgArea || pgTokenBuff) {

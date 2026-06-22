@@ -1977,5 +1977,13 @@ const PF2E_ANIMATION_TREES = {
     "clinging-ice": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.ray_of_frost.blue"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.ice_spikes.radial.burst.white"}],
     "shield": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.shield.01"}],
     "shroud-of-night": [{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.darkness.black"}],
-    "tangle-vine": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.vine.complete"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.entangle.green"}]
+    "tangle-vine": [{"trigger":"attack-roll","role":"projectile","predicate":[],"file":"jb2a.vine.complete"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.entangle.green"}],
+    "allegro": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}],
+    "courageous-anthem": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.bardic_inspiration"}],
+    "dirge-of-doom": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"},{"trigger":"attack-roll","role":"impact","predicate":[],"file":"jb2a.markers"}],
+    "rallying-anthem": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.bardic_inspiration"}],
+    "song-of-marching": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff"}],
+    "song-of-strength": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.on_token_buff"}],
+    "triple-time": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}],
+    "uplifting-overture": [{"trigger":"attack-roll","role":"tokenBuff","predicate":[],"file":"jb2a.music_notations"}]
 };

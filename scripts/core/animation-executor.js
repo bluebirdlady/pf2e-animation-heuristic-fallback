@@ -88,6 +88,23 @@ async function executeHeuristicAnimation(spell, token, precomputedConfig = null)
         );
     }
 
+    // PHASE 0: Tree-sourced self-cast overlay — plays on the caster token
+    // regardless of type or targets. Used by hybrid spells that need both a
+    // caster effect and a target effect (e.g. Dirge of Doom: music notes on
+    // bard + dark markers on target). Pure self-buffs use type="utility" and
+    // skip this phase (their tokenBuff plays in the else branch instead).
+    if (animationConfig.treeTokenBuff && animationConfig.tokenBuff) {
+        console.log(`%c[DEPLOYING] Self-Cast Overlay -> .file("${animationConfig.tokenBuff}")`, "color: #00ccff;");
+        seq.effect()
+            .file(animationConfig.tokenBuff)
+            .atLocation(token)
+            .size(token.document.width * 1.2, { gridUnits: true })
+            .duration(4000)
+            .fadeIn(500)
+            .fadeOut(500)
+            .attachTo(token);
+    }
+
     // PHASE 1: Casting Origin Elements
     if (animationConfig.castRing) {
         console.log(`%c[DEPLOYING] Cast Ring -> .file(${animationConfig.castRingVariants ? `[${animationConfig.castRingVariants.length} variants]` : `"${animationConfig.castRing}"`})`, "color: #00ccff;");
@@ -262,7 +279,8 @@ async function executeHeuristicAnimation(spell, token, precomputedConfig = null)
     } 
     // PHASE 5: Utility / Personal Buff Route
     else {
-        if (animationConfig.tokenBuff) {
+        // treeTokenBuff spells already played their overlay in Phase 0
+        if (animationConfig.tokenBuff && !animationConfig.treeTokenBuff) {
             console.log(`%c[DEPLOYING] Token Buff -> .file(${animationConfig.tokenBuffVariants ? `[${animationConfig.tokenBuffVariants.length} variants]` : `"${animationConfig.tokenBuff}"`})`, "color: #00ccff;");
             seq.effect()
                 .file(animationConfig.tokenBuffVariants || animationConfig.tokenBuff)
