@@ -1004,6 +1004,16 @@ const PF2E_STRIKE_TREES = {
                 ],
                 "file": "jb2a.spear.melee.01.white"
             }
+        ],
+        "sword": [
+            {
+                "trigger": "attack-roll",
+                "role": "impact",
+                "predicate": [
+                    "melee"
+                ],
+                "file": "jb2a.sword.melee.01.white"
+            }
         ]
     }
 };

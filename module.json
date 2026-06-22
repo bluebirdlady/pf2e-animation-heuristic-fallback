@@ -2,7 +2,7 @@
   "id": "pf2e-heuristic-fallback",
   "title": "PF2e Animation Heuristic Fallback",
   "description": "Provides intelligent fallback animations for PF2e spells using JB2A assets with deep spell understanding and heuristic routing.",
-  "version": "8.3.1",
+  "version": "8.3.2",
   "compatibility": {
     "minimum": "12",
     "verified": "14",
